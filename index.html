@@ -1,0 +1,6123 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MYSTERY DROP // 19.11</title>
+
+<meta name="theme-color" content="#05060a">
+<meta name="description" content="A personalized digital gift experience">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+
+/* =========================================================
+   CORE
+========================================================= */
+
+:root{
+    --bg:#05060a;
+    --bg2:#090b12;
+    --panel:rgba(12,15,25,.72);
+
+    --text:#f4f7ff;
+    --muted:#8991a7;
+
+    --accent:#7c5cff;
+    --accent2:#00e5ff;
+    --accent3:#ff3cac;
+
+    --success:#45f0a0;
+    --warning:#ffd166;
+    --danger:#ff5370;
+
+    --border:rgba(255,255,255,.10);
+
+    --radius:24px;
+
+    --mx:50%;
+    --my:50%;
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    background:
+        radial-gradient(circle at var(--mx) var(--my),
+        rgba(124,92,255,.12),
+        transparent 30%),
+        radial-gradient(circle at 20% 20%,
+        rgba(0,229,255,.05),
+        transparent 30%),
+        var(--bg);
+
+    color:var(--text);
+
+    font-family:"Inter",sans-serif;
+
+    min-height:100vh;
+
+    overflow-x:hidden;
+
+    transition:
+        background .6s ease,
+        color .6s ease;
+}
+
+button,
+input{
+    font-family:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+::selection{
+    background:var(--accent);
+    color:white;
+}
+
+/* =========================================================
+   GLOBAL FX
+========================================================= */
+
+.noise{
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    pointer-events:none;
+
+    opacity:.035;
+
+    background-image:
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E");
+}
+
+.scanlines{
+    position:fixed;
+    inset:0;
+    z-index:9998;
+    pointer-events:none;
+
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            transparent 0px,
+            transparent 3px,
+            rgba(255,255,255,.018) 4px
+        );
+
+    opacity:.25;
+}
+
+#particles{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+}
+
+#matrix{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:1;
+
+    opacity:0;
+
+    transition:opacity .5s;
+}
+
+.cursor{
+    position:fixed;
+
+    width:350px;
+    height:350px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(124,92,255,.12) 0%,
+            rgba(0,229,255,.05) 35%,
+            transparent 70%
+        );
+
+    transform:translate(-50%,-50%);
+
+    pointer-events:none;
+
+    z-index:2;
+
+    mix-blend-mode:screen;
+}
+
+/* =========================================================
+   BOOT
+========================================================= */
+
+#boot{
+    position:fixed;
+    inset:0;
+
+    background:#020307;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    z-index:10000;
+
+    transition:
+        opacity .8s,
+        visibility .8s;
+}
+
+#boot.hidden{
+    opacity:0;
+    visibility:hidden;
+}
+
+.boot-box{
+    width:min(760px,90vw);
+
+    font-family:"Space Mono",monospace;
+
+    color:#b9c2d8;
+
+    font-size:13px;
+
+    line-height:1.9;
+}
+
+.boot-title{
+    font-size:28px;
+    font-weight:700;
+
+    color:white;
+
+    margin-bottom:30px;
+
+    letter-spacing:5px;
+}
+
+.boot-line{
+    opacity:0;
+    transform:translateY(8px);
+
+    animation:bootLine .35s forwards;
+}
+
+.boot-line span{
+    color:var(--success);
+}
+
+.boot-progress{
+    height:3px;
+
+    background:#141722;
+
+    margin-top:28px;
+
+    overflow:hidden;
+}
+
+.boot-progress-bar{
+    width:0%;
+    height:100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--accent),
+            var(--accent2),
+            var(--accent3)
+        );
+
+    box-shadow:
+        0 0 20px var(--accent2);
+
+    transition:width .2s;
+}
+
+@keyframes bootLine{
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+/* =========================================================
+   APP
+========================================================= */
+
+#app{
+    position:relative;
+    z-index:3;
+
+    opacity:0;
+
+    transition:opacity .8s;
+}
+
+#app.ready{
+    opacity:1;
+}
+
+/* =========================================================
+   NAV
+========================================================= */
+
+.nav{
+    position:fixed;
+
+    top:20px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:min(1100px,calc(100% - 30px));
+
+    height:64px;
+
+    border:1px solid var(--border);
+
+    background:rgba(5,6,10,.65);
+
+    backdrop-filter:blur(25px);
+
+    border-radius:999px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:0 18px;
+
+    z-index:500;
+
+    box-shadow:
+        0 15px 60px rgba(0,0,0,.35);
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    font-family:"Space Mono",monospace;
+
+    font-size:12px;
+    font-weight:700;
+
+    letter-spacing:2px;
+}
+
+.logo-dot{
+    width:9px;
+    height:9px;
+
+    background:var(--accent2);
+
+    border-radius:50%;
+
+    box-shadow:
+        0 0 15px var(--accent2);
+
+    animation:pulse 1.5s infinite;
+}
+
+.nav-right{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.nav-btn{
+    width:38px;
+    height:38px;
+
+    border:1px solid var(--border);
+
+    background:rgba(255,255,255,.03);
+
+    color:white;
+
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    transition:.25s;
+}
+
+.nav-btn:hover{
+    transform:translateY(-2px);
+
+    background:rgba(255,255,255,.08);
+
+    border-color:var(--accent);
+}
+
+/* =========================================================
+   SECTIONS
+========================================================= */
+
+.screen{
+    min-height:100vh;
+
+    width:100%;
+
+    display:none;
+
+    align-items:center;
+    justify-content:center;
+
+    padding:
+        120px
+        25px
+        100px;
+
+    position:relative;
+}
+
+.screen.active{
+    display:flex;
+}
+
+.container{
+    width:min(1100px,100%);
+
+    margin:auto;
+
+    position:relative;
+}
+
+/* =========================================================
+   TYPOGRAPHY
+========================================================= */
+
+.kicker{
+    font-family:"Space Mono",monospace;
+
+    color:var(--accent2);
+
+    font-size:11px;
+
+    letter-spacing:4px;
+
+    text-transform:uppercase;
+
+    margin-bottom:22px;
+}
+
+.big-title{
+    font-size:
+        clamp(48px,9vw,120px);
+
+    line-height:.88;
+
+    letter-spacing:-6px;
+
+    font-weight:900;
+
+    max-width:900px;
+}
+
+.gradient-text{
+    background:
+        linear-gradient(
+            110deg,
+            white 0%,
+            var(--accent2) 35%,
+            var(--accent) 65%,
+            var(--accent3) 100%
+        );
+
+    -webkit-background-clip:text;
+    background-clip:text;
+
+    color:transparent;
+
+    background-size:200% auto;
+
+    animation:gradientMove 5s linear infinite;
+}
+
+@keyframes gradientMove{
+    to{
+        background-position:200% center;
+    }
+}
+
+.subtitle{
+    color:var(--muted);
+
+    font-size:17px;
+
+    line-height:1.8;
+
+    max-width:650px;
+
+    margin-top:30px;
+}
+
+/* =========================================================
+   BUTTON
+========================================================= */
+
+.primary-btn{
+    border:0;
+
+    padding:16px 25px;
+
+    border-radius:999px;
+
+    background:
+        linear-gradient(
+            100deg,
+            var(--accent),
+            var(--accent2)
+        );
+
+    color:white;
+
+    font-weight:800;
+
+    letter-spacing:.5px;
+
+    box-shadow:
+        0 0 35px rgba(124,92,255,.25);
+
+    transition:
+        transform .25s,
+        box-shadow .25s;
+}
+
+.primary-btn:hover{
+    transform:
+        translateY(-3px)
+        scale(1.02);
+
+    box-shadow:
+        0 10px 50px rgba(124,92,255,.45);
+}
+
+.secondary-btn{
+    border:1px solid var(--border);
+
+    padding:15px 23px;
+
+    border-radius:999px;
+
+    background:rgba(255,255,255,.04);
+
+    color:white;
+
+    font-weight:700;
+
+    transition:.25s;
+}
+
+.secondary-btn:hover{
+    border-color:var(--accent2);
+
+    background:rgba(0,229,255,.06);
+}
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero{
+    min-height:100vh;
+}
+
+.hero-grid{
+    position:absolute;
+    inset:0;
+
+    background-image:
+        linear-gradient(
+            rgba(255,255,255,.025) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.025) 1px,
+            transparent 1px
+        );
+
+    background-size:
+        55px 55px;
+
+    mask-image:
+        radial-gradient(circle at center,
+        black 0%,
+        transparent 75%);
+
+    pointer-events:none;
+}
+
+.hero-orb{
+    position:absolute;
+
+    width:500px;
+    height:500px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(124,92,255,.20),
+            transparent 65%
+        );
+
+    filter:blur(20px);
+
+    animation:float 8s ease-in-out infinite;
+}
+
+.hero-orb.one{
+    top:-200px;
+    right:-100px;
+}
+
+.hero-orb.two{
+    bottom:-250px;
+    left:-180px;
+
+    animation-delay:-3s;
+}
+
+@keyframes float{
+    0%,100%{
+        transform:translate3d(0,0,0);
+    }
+
+    50%{
+        transform:translate3d(0,-30px,0);
+    }
+}
+
+.hero-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+
+    margin-top:40px;
+}
+
+.hero-meta{
+    margin-top:70px;
+
+    display:flex;
+    gap:40px;
+
+    flex-wrap:wrap;
+}
+
+.meta-item{
+    font-family:"Space Mono",monospace;
+
+    font-size:10px;
+
+    color:var(--muted);
+
+    letter-spacing:1px;
+}
+
+.meta-item strong{
+    display:block;
+
+    color:white;
+
+    font-size:13px;
+
+    margin-top:7px;
+}
+
+/* =========================================================
+   ACCESS
+========================================================= */
+
+.access-card{
+    width:min(760px,100%);
+
+    border:1px solid var(--border);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.07),
+            rgba(255,255,255,.02)
+        );
+
+    border-radius:30px;
+
+    padding:35px;
+
+    backdrop-filter:blur(30px);
+
+    box-shadow:
+        0 30px 100px rgba(0,0,0,.45);
+
+    position:relative;
+
+    overflow:hidden;
+}
+
+.access-card::before{
+    content:"";
+
+    position:absolute;
+
+    width:300px;
+    height:300px;
+
+    top:-150px;
+    right:-100px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(0,229,255,.13),
+            transparent 70%
+        );
+}
+
+.terminal-top{
+    display:flex;
+    gap:7px;
+
+    margin-bottom:30px;
+}
+
+.terminal-dot{
+    width:9px;
+    height:9px;
+
+    border-radius:50%;
+
+    background:#555;
+}
+
+.terminal-dot:nth-child(1){
+    background:#ff5370;
+}
+
+.terminal-dot:nth-child(2){
+    background:#ffd166;
+}
+
+.terminal-dot:nth-child(3){
+    background:#45f0a0;
+}
+
+.terminal-text{
+    font-family:"Space Mono",monospace;
+
+    color:var(--muted);
+
+    font-size:11px;
+
+    margin-bottom:12px;
+}
+
+.code-row{
+    display:flex;
+    gap:12px;
+
+    margin-top:20px;
+}
+
+.code-input{
+    flex:1;
+
+    min-width:0;
+
+    background:#05070d;
+
+    border:1px solid var(--border);
+
+    color:white;
+
+    border-radius:15px;
+
+    padding:18px 20px;
+
+    outline:none;
+
+    font-family:"Space Mono",monospace;
+
+    letter-spacing:3px;
+
+    font-size:14px;
+
+    transition:.25s;
+}
+
+.code-input:focus{
+    border-color:var(--accent2);
+
+    box-shadow:
+        0 0 30px rgba(0,229,255,.1);
+}
+
+.error{
+    color:var(--danger);
+
+    font-family:"Space Mono",monospace;
+
+    font-size:11px;
+
+    margin-top:15px;
+
+    min-height:18px;
+}
+
+.hint{
+    margin-top:25px;
+
+    color:#626a7f;
+
+    font-size:11px;
+
+    font-family:"Space Mono",monospace;
+
+    line-height:1.8;
+}
+
+/* =========================================================
+   DECRYPT
+========================================================= */
+
+.decrypt{
+    text-align:center;
+}
+
+.decrypt-title{
+    font-family:"Space Mono",monospace;
+
+    font-size:12px;
+
+    letter-spacing:5px;
+
+    color:var(--accent2);
+
+    margin-bottom:30px;
+}
+
+.decrypt-name{
+    font-size:
+        clamp(40px,8vw,90px);
+
+    font-weight:900;
+
+    letter-spacing:-4px;
+
+    margin-bottom:30px;
+}
+
+.decrypt-bar{
+    width:min(700px,100%);
+
+    height:5px;
+
+    background:#151823;
+
+    border-radius:99px;
+
+    overflow:hidden;
+
+    margin:auto;
+}
+
+.decrypt-fill{
+    height:100%;
+
+    width:0%;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--accent),
+            var(--accent2),
+            var(--accent3)
+        );
+
+    box-shadow:
+        0 0 25px var(--accent2);
+}
+
+.decrypt-percent{
+    font-family:"Space Mono",monospace;
+
+    color:var(--muted);
+
+    font-size:11px;
+
+    margin-top:15px;
+}
+
+/* =========================================================
+   IDENTITY
+========================================================= */
+
+.identity{
+    display:grid;
+
+    grid-template-columns:
+        1fr .8fr;
+
+    gap:50px;
+
+    align-items:center;
+}
+
+.identity-name{
+    font-size:
+        clamp(42px,7vw,85px);
+
+    line-height:.95;
+
+    font-weight:900;
+
+    letter-spacing:-4px;
+}
+
+.identity-role{
+    color:var(--accent2);
+
+    font-family:"Space Mono",monospace;
+
+    letter-spacing:3px;
+
+    font-size:12px;
+
+    margin-top:20px;
+}
+
+.identity-description{
+    color:var(--muted);
+
+    line-height:1.8;
+
+    max-width:650px;
+
+    margin-top:25px;
+}
+
+.identity-side{
+    display:flex;
+
+    justify-content:center;
+}
+
+.rarity-ring{
+    width:260px;
+    height:260px;
+
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    position:relative;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(124,92,255,.15),
+            transparent 65%
+        );
+}
+
+.rarity-ring::before,
+.rarity-ring::after{
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    border:1px solid rgba(124,92,255,.4);
+
+    border-radius:50%;
+
+    animation:spin 8s linear infinite;
+}
+
+.rarity-ring::after{
+    inset:20px;
+
+    border-color:rgba(0,229,255,.3);
+
+    animation:
+        spinReverse 5s linear infinite;
+}
+
+.rarity-symbol{
+    font-size:80px;
+
+    z-index:2;
+
+    text-shadow:
+        0 0 40px var(--accent);
+}
+
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+@keyframes spinReverse{
+    to{
+        transform:rotate(-360deg);
+    }
+}
+
+/* =========================================================
+   PLAYER CARD
+========================================================= */
+
+.card-area{
+    perspective:1600px;
+
+    display:flex;
+
+    justify-content:center;
+
+    margin-bottom:50px;
+}
+
+.player-card{
+    width:min(440px,90vw);
+
+    aspect-ratio:1.45/1;
+
+    position:relative;
+
+    transform-style:preserve-3d;
+
+    transition:transform .15s;
+
+    cursor:pointer;
+}
+
+.card-inner{
+    width:100%;
+    height:100%;
+
+    position:relative;
+
+    transform-style:preserve-3d;
+
+    transition:transform .8s;
+
+}
+
+.player-card.flipped .card-inner{
+    transform:rotateY(180deg);
+}
+
+.card-face{
+    position:absolute;
+
+    inset:0;
+
+    backface-visibility:hidden;
+
+    border-radius:28px;
+
+    overflow:hidden;
+
+    border:1px solid rgba(255,255,255,.2);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(30,34,60,.95),
+            rgba(7,9,18,.98)
+        );
+
+    box-shadow:
+        0 30px 100px rgba(0,0,0,.55);
+}
+
+.card-front{
+    padding:28px;
+
+    display:flex;
+    flex-direction:column;
+
+    justify-content:space-between;
+}
+
+.card-back{
+    transform:rotateY(180deg);
+
+    padding:28px;
+
+    display:flex;
+    flex-direction:column;
+
+    justify-content:space-between;
+}
+
+.card-shine{
+    position:absolute;
+
+    inset:-100%;
+
+    background:
+        linear-gradient(
+            115deg,
+            transparent 40%,
+            rgba(255,255,255,.25) 50%,
+            transparent 60%
+        );
+
+    transform:translateX(-30%);
+
+    pointer-events:none;
+}
+
+.card-front:hover .card-shine{
+    animation:shine 1.2s;
+}
+
+@keyframes shine{
+    to{
+        transform:translateX(30%);
+    }
+}
+
+.card-header{
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-start;
+}
+
+.card-brand{
+    font-family:"Space Mono",monospace;
+
+    font-size:9px;
+
+    letter-spacing:2px;
+
+    color:var(--accent2);
+}
+
+.rarity{
+    font-family:"Space Mono",monospace;
+
+    font-size:9px;
+
+    color:var(--warning);
+
+    letter-spacing:2px;
+}
+
+.card-avatar{
+    width:90px;
+    height:90px;
+
+    border-radius:20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--accent),
+            var(--accent2)
+        );
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:32px;
+
+    font-weight:900;
+
+    box-shadow:
+        0 0 40px rgba(124,92,255,.25);
+}
+
+.card-bottom{
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-end;
+}
+
+.card-name{
+    font-size:27px;
+
+    font-weight:900;
+}
+
+.card-role{
+    color:var(--muted);
+
+    font-family:"Space Mono",monospace;
+
+    font-size:9px;
+
+    margin-top:5px;
+}
+
+.card-level{
+    text-align:right;
+
+    font-family:"Space Mono",monospace;
+
+    font-size:9px;
+
+    color:var(--muted);
+}
+
+.card-level strong{
+    display:block;
+
+    color:white;
+
+    font-size:20px;
+}
+
+.flip-hint{
+    text-align:center;
+
+    color:#626a7f;
+
+    font-family:"Space Mono",monospace;
+
+    font-size:10px;
+}
+
+/* =========================================================
+   STATS
+========================================================= */
+
+.section-title{
+    font-size:
+        clamp(35px,6vw,70px);
+
+    font-weight:900;
+
+    letter-spacing:-3px;
+
+    margin-bottom:15px;
+}
+
+.section-description{
+    color:var(--muted);
+
+    line-height:1.8;
+
+    max-width:700px;
+
+    margin-bottom:45px;
+}
+
+.stats{
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:15px;
+}
+
+.stat{
+    border:1px solid var(--border);
+
+    background:
+        rgba(255,255,255,.025);
+
+    border-radius:20px;
+
+    padding:25px;
+
+    position:relative;
+
+    overflow:hidden;
+}
+
+.stat::after{
+    content:"";
+
+    position:absolute;
+
+    bottom:0;
+    left:0;
+
+    width:100%;
+    height:2px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            var(--accent),
+            transparent
+        );
+
+    transform:translateX(-100%);
+
+    transition:.6s;
+}
+
+.stat:hover::after{
+    transform:translateX(0);
+}
+
+.stat-label{
+    color:var(--muted);
+
+    font-family:"Space Mono",monospace;
+
+    font-size:9px;
+
+    letter-spacing:2px;
+}
+
+.stat-value{
+    font-size:40px;
+
+    font-weight:900;
+
+    margin:10px 0;
+}
+
+.stat-bar{
+    height:4px;
+
+    background:#171a25;
+
+    border-radius:99px;
+
+    overflow:hidden;
+}
+
+.stat-fill{
+    height:100%;
+
+    width:0%;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--accent),
+            var(--accent2)
+        );
+
+    transition:
+        width 1.4s cubic-bezier(.2,.8,.2,1);
+}
+
+/* =========================================================
+   PERSONALITY
+========================================================= */
+
+.personality-grid{
+    display:grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:20px;
+}
+
+.info-box{
+    border:1px solid var(--border);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.055),
+            rgba(255,255,255,.015)
+        );
+
+    border-radius:24px;
+
+    padding:30px;
+
+    min-height:220px;
+
+    transition:
+        transform .3s,
+        border-color .3s;
+}
+
+.info-box:hover{
+    transform:translateY(-5px);
+
+    border-color:
+        rgba(124,92,255,.5);
+}
+
+.info-icon{
+    font-size:25px;
+
+    margin-bottom:20px;
+}
+
+.info-title{
+    font-size:12px;
+
+    font-family:"Space Mono",monospace;
+
+    color:var(--accent2);
+
+    letter-spacing:2px;
+
+    margin-bottom:15px;
+}
+
+.info-text{
+    color:#c5cada;
+
+    line-height:1.9;
+
+    font-size:14px;
+}
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+.message-card{
+    max-width:900px;
+
+    margin:auto;
+
+    border:1px solid var(--border);
+
+    background:
+        rgba(8,10,18,.78);
+
+    border-radius:30px;
+
+    padding:
+        clamp(28px,6vw,65px);
+
+    position:relative;
+
+    box-shadow:
+        0 30px 100px rgba(0,0,0,.4);
+}
+
+.message-card::before{
+    content:"“";
+
+    position:absolute;
+
+    top:-35px;
+    left:35px;
+
+    font-size:180px;
+
+    color:rgba(124,92,255,.12);
+
+    font-family:Georgia,serif;
+
+    pointer-events:none;
+}
+
+.message-tag{
+    font-family:"Space Mono",monospace;
+
+    color:var(--accent2);
+
+    font-size:10px;
+
+    letter-spacing:3px;
+
+    margin-bottom:30px;
+}
+
+.message-title{
+    font-size:
+        clamp(30px,5vw,55px);
+
+    font-weight:900;
+
+    letter-spacing:-2px;
+
+    margin-bottom:30px;
+}
+
+.message-body{
+    color:#c8cede;
+
+    font-size:16px;
+
+    line-height:2;
+
+    white-space:pre-line;
+}
+
+.signature{
+    margin-top:40px;
+
+    color:white;
+
+    font-weight:800;
+
+    font-size:15px;
+}
+
+.signature span{
+    color:var(--accent2);
+}
+
+/* =========================================================
+   TIMELINE
+========================================================= */
+
+.timeline{
+    position:relative;
+
+    max-width:800px;
+
+    margin:auto;
+}
+
+.timeline::before{
+    content:"";
+
+    position:absolute;
+
+    top:0;
+    bottom:0;
+
+    left:14px;
+
+    width:1px;
+
+    background:
+        linear-gradient(
+            var(--accent),
+            var(--accent2),
+            transparent
+        );
+}
+
+.timeline-item{
+    position:relative;
+
+    padding-left:55px;
+
+    margin-bottom:45px;
+}
+
+.timeline-dot{
+    position:absolute;
+
+    left:8px;
+    top:4px;
+
+    width:13px;
+    height:13px;
+
+    border-radius:50%;
+
+    background:var(--accent2);
+
+    box-shadow:
+        0 0 20px var(--accent2);
+}
+
+.timeline-date{
+    font-family:"Space Mono",monospace;
+
+    font-size:10px;
+
+    color:var(--accent2);
+
+    letter-spacing:2px;
+
+    margin-bottom:10px;
+}
+
+.timeline-title{
+    font-size:22px;
+
+    font-weight:800;
+
+    margin-bottom:8px;
+}
+
+.timeline-text{
+    color:var(--muted);
+
+    line-height:1.8;
+
+    font-size:14px;
+}
+
+/* =========================================================
+   SECRET
+========================================================= */
+
+.secret-wrap{
+    text-align:center;
+
+    max-width:800px;
+
+    margin:auto;
+}
+
+.lock{
+    width:110px;
+    height:110px;
+
+    border:1px solid var(--border);
+
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    margin:0 auto 35px;
+
+    font-size:40px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(124,92,255,.15),
+            transparent 65%
+        );
+
+    box-shadow:
+        0 0 60px rgba(124,92,255,.1);
+
+    animation:pulseRing 2s infinite;
+}
+
+@keyframes pulseRing{
+    0%,100%{
+        box-shadow:
+            0 0 20px rgba(124,92,255,.1);
+    }
+
+    50%{
+        box-shadow:
+            0 0 70px rgba(124,92,255,.3);
+    }
+}
+
+.secret-content{
+    display:none;
+
+    margin-top:35px;
+
+    border:1px solid rgba(0,229,255,.25);
+
+    background:
+        rgba(0,229,255,.035);
+
+    border-radius:24px;
+
+    padding:35px;
+
+    animation:reveal .6s;
+}
+
+.secret-content.show{
+    display:block;
+}
+
+.secret-message{
+    color:#d8deed;
+
+    line-height:2;
+
+    font-size:16px;
+}
+
+@keyframes reveal{
+    from{
+        opacity:0;
+        transform:translateY(15px);
+    }
+
+    to{
+        opacity:1;
+        transform:none;
+    }
+}
+
+/* =========================================================
+   FINAL
+========================================================= */
+
+.final{
+    text-align:center;
+}
+
+.final-code{
+    font-family:"Space Mono",monospace;
+
+    color:var(--accent2);
+
+    letter-spacing:4px;
+
+    font-size:11px;
+
+    margin-bottom:25px;
+}
+
+.final-title{
+    font-size:
+        clamp(48px,9vw,110px);
+
+    font-weight:900;
+
+    line-height:.9;
+
+    letter-spacing:-6px;
+}
+
+.final-sub{
+    max-width:600px;
+
+    margin:30px auto;
+
+    color:var(--muted);
+
+    line-height:1.9;
+}
+
+.final-sign{
+    font-family:"Space Mono",monospace;
+
+    font-size:11px;
+
+    color:#5f687c;
+
+    margin-top:50px;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer{
+    position:fixed;
+
+    bottom:20px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    z-index:500;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    padding:9px 14px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:999px;
+
+    background:
+        rgba(5,6,10,.7);
+
+    backdrop-filter:blur(20px);
+}
+
+.page-dot{
+    width:5px;
+    height:5px;
+
+    border-radius:50%;
+
+    background:#3d4353;
+
+    transition:.3s;
+}
+
+.page-dot.active{
+    width:20px;
+
+    border-radius:99px;
+
+    background:var(--accent2);
+
+    box-shadow:
+        0 0 10px var(--accent2);
+}
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+.toast{
+    position:fixed;
+
+    bottom:90px;
+
+    left:50%;
+
+    transform:
+        translateX(-50%)
+        translateY(20px);
+
+    opacity:0;
+
+    pointer-events:none;
+
+    z-index:1000;
+
+    padding:14px 20px;
+
+    border:
+        1px solid var(--border);
+
+    background:
+        rgba(10,12,20,.9);
+
+    backdrop-filter:blur(20px);
+
+    border-radius:999px;
+
+    font-family:"Space Mono",monospace;
+
+    font-size:10px;
+
+    color:white;
+
+    transition:.3s;
+}
+
+.toast.show{
+    opacity:1;
+
+    transform:
+        translateX(-50%)
+        translateY(0);
+}
+
+/* =========================================================
+   COMMAND PALETTE
+========================================================= */
+
+.command{
+    position:fixed;
+
+    inset:0;
+
+    z-index:2000;
+
+    background:
+        rgba(0,0,0,.65);
+
+    backdrop-filter:blur(15px);
+
+    display:none;
+
+    align-items:flex-start;
+
+    justify-content:center;
+
+    padding-top:15vh;
+}
+
+.command.show{
+    display:flex;
+}
+
+.command-box{
+    width:min(600px,90vw);
+
+    border:
+        1px solid var(--border);
+
+    background:
+        #090b12;
+
+    border-radius:22px;
+
+    overflow:hidden;
+
+    box-shadow:
+        0 40px 100px rgba(0,0,0,.6);
+}
+
+.command-input{
+    width:100%;
+
+    background:transparent;
+
+    border:0;
+
+    border-bottom:1px solid var(--border);
+
+    padding:20px;
+
+    color:white;
+
+    outline:none;
+
+    font-family:"Space Mono",monospace;
+}
+
+.command-list{
+    padding:10px;
+}
+
+.command-item{
+    padding:15px;
+
+    border-radius:12px;
+
+    color:#b6bed0;
+
+    font-size:13px;
+
+    transition:.2s;
+}
+
+.command-item:hover{
+    background:rgba(124,92,255,.1);
+
+    color:white;
+}
+
+/* =========================================================
+   GLITCH
+========================================================= */
+
+.glitch{
+    position:relative;
+}
+
+.glitch::before,
+.glitch::after{
+    content:attr(data-text);
+
+    position:absolute;
+
+    inset:0;
+
+    pointer-events:none;
+
+    opacity:.5;
+}
+
+.glitch::before{
+    color:#00ffff;
+
+    transform:
+        translate(2px,0);
+
+    clip-path:
+        inset(0 0 60% 0);
+
+    animation:glitch1 2s infinite;
+}
+
+.glitch::after{
+    color:#ff0055;
+
+    transform:
+        translate(-2px,0);
+
+    clip-path:
+        inset(60% 0 0 0);
+
+    animation:glitch2 2s infinite;
+}
+
+@keyframes glitch1{
+    0%,90%,100%{
+        transform:translate(2px,0);
+    }
+
+    92%{
+        transform:translate(8px,-2px);
+    }
+
+    94%{
+        transform:translate(-5px,2px);
+    }
+}
+
+@keyframes glitch2{
+    0%,90%,100%{
+        transform:translate(-2px,0);
+    }
+
+    93%{
+        transform:translate(-8px,2px);
+    }
+
+    95%{
+        transform:translate(5px,-2px);
+    }
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:800px){
+
+    .nav{
+        top:12px;
+    }
+
+    .screen{
+        padding:
+            105px 18px 90px;
+    }
+
+    .big-title{
+        letter-spacing:-4px;
+    }
+
+    .identity{
+        grid-template-columns:1fr;
+
+        text-align:center;
+    }
+
+    .identity-description{
+        margin-left:auto;
+        margin-right:auto;
+    }
+
+    .stats{
+        grid-template-columns:
+            repeat(2,1fr);
+    }
+
+    .personality-grid{
+        grid-template-columns:1fr;
+    }
+
+    .hero-meta{
+        gap:20px;
+    }
+
+    .code-row{
+        flex-direction:column;
+    }
+
+    .code-input{
+        width:100%;
+    }
+
+    .primary-btn,
+    .secondary-btn{
+        width:100%;
+    }
+
+    .hero-actions{
+        flex-direction:column;
+    }
+}
+
+@media(max-width:500px){
+
+    .stats{
+        grid-template-columns:1fr;
+    }
+
+    .big-title{
+        font-size:48px;
+    }
+
+    .section-title{
+        font-size:42px;
+    }
+
+    .card-avatar{
+        width:65px;
+        height:65px;
+
+        font-size:24px;
+    }
+
+    .card-name{
+        font-size:21px;
+    }
+
+    .message-body{
+        font-size:14px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="noise"></div>
+<div class="scanlines"></div>
+
+<div class="cursor" id="cursor"></div>
+
+<canvas id="particles"></canvas>
+<canvas id="matrix"></canvas>
+
+<!-- =======================================================
+BOOT
+======================================================= -->
+
+<div id="boot">
+
+    <div class="boot-box">
+
+        <div class="boot-title">
+            MYSTERY DROP
+        </div>
+
+        <div class="boot-line">
+            > INITIALIZING CORE...
+        </div>
+
+        <div class="boot-line" style="animation-delay:.2s">
+            > LOADING RECIPIENT DATABASE...
+        </div>
+
+        <div class="boot-line" style="animation-delay:.4s">
+            > PERSONALIZATION ENGINE: <span>ONLINE</span>
+        </div>
+
+        <div class="boot-line" style="animation-delay:.6s">
+            > MEMORY CORE: <span>READY</span>
+        </div>
+
+        <div class="boot-line" style="animation-delay:.8s">
+            > ENCRYPTION LAYER: <span>ACTIVE</span>
+        </div>
+
+        <div class="boot-line" style="animation-delay:1s">
+            > DROP DATE: <span>19.11.2026</span>
+        </div>
+
+        <div class="boot-progress">
+            <div
+                class="boot-progress-bar"
+                id="bootProgress">
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =======================================================
+APP
+======================================================= -->
+
+<div id="app">
+
+<!-- NAV -->
+
+<nav class="nav">
+
+    <div class="logo">
+
+        <div class="logo-dot"></div>
+
+        <span>MYSTERY//DROP</span>
+
+    </div>
+
+    <div class="nav-right">
+
+        <button
+            class="nav-btn"
+            onclick="toggleSound()"
+            id="soundBtn"
+            title="Sound">
+            ♪
+        </button>
+
+        <button
+            class="nav-btn"
+            onclick="openCommand()"
+            title="Command">
+            /
+        </button>
+
+    </div>
+
+</nav>
+
+<!-- =======================================================
+SCREEN 1
+======================================================= -->
+
+<section class="screen active" id="page1">
+
+    <div class="hero-grid"></div>
+
+    <div class="hero-orb one"></div>
+    <div class="hero-orb two"></div>
+
+    <div class="container">
+
+        <div class="kicker">
+            19.11 // PERSONAL DIGITAL DROP
+        </div>
+
+        <h1 class="big-title glitch"
+            data-text="SOME THINGS">
+            SOME THINGS
+        </h1>
+
+        <h1 class="big-title gradient-text">
+            ARE MEANT
+            <br>
+            TO BE UNLOCKED.
+        </h1>
+
+        <p class="subtitle">
+
+            Đây không phải một website thông thường.
+            Đây là một món quà được chia thành nhiều lớp —
+            và chỉ người có đúng mật mã mới có thể mở nó.
+
+        </p>
+
+        <div class="hero-actions">
+
+            <button
+                class="primary-btn"
+                onclick="goTo(2)">
+                BEGIN THE DROP →
+            </button>
+
+            <button
+                class="secondary-btn"
+                onclick="showToast('Hint: mật mã nằm trên món quà của mày.')">
+                HOW DOES IT WORK?
+            </button>
+
+        </div>
+
+        <div class="hero-meta">
+
+            <div class="meta-item">
+                DATE
+                <strong>19 / 11 / 2026</strong>
+            </div>
+
+            <div class="meta-item">
+                RECIPIENTS
+                <strong>13 UNIQUE DROPS</strong>
+            </div>
+
+            <div class="meta-item">
+                SYSTEM
+                <strong>PERSONALIZED</strong>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =======================================================
+SCREEN 2
+======================================================= -->
+
+<section class="screen" id="page2">
+
+    <div class="container">
+
+        <div class="access-card">
+
+            <div class="terminal-top">
+                <div class="terminal-dot"></div>
+                <div class="terminal-dot"></div>
+                <div class="terminal-dot"></div>
+            </div>
+
+            <div class="terminal-text">
+                MYSTERY DROP TERMINAL v19.11
+            </div>
+
+            <div class="terminal-text">
+                > ENTER YOUR PERSONAL ACCESS CODE
+            </div>
+
+            <div class="code-row">
+
+                <input
+                    id="codeInput"
+                    class="code-input"
+                    placeholder="KOD-XXX-XXX"
+                    autocomplete="off"
+                    spellcheck="false"
+                    maxlength="15">
+
+                <button
+                    class="primary-btn"
+                    onclick="verifyCode()">
+                    UNLOCK
+                </button>
+
+            </div>
+
+            <div
+                class="error"
+                id="codeError">
+            </div>
+
+            <div class="hint">
+
+                FORMAT:
+                KOD-XXX-XXX
+
+                <br>
+
+                Mỗi người có một code riêng.
+
+                <br>
+
+                Không có code?
+                Không có access.
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =======================================================
+SCREEN 3
+======================================================= -->
+
+<section class="screen" id="page3">
+
+    <div class="container decrypt">
+
+        <div class="decrypt-title">
+            DECRYPTING PERSONAL PROFILE
+        </div>
+
+        <div
+            class="decrypt-name"
+            id="decryptName">
+            UNKNOWN
+        </div>
+
+        <div class="decrypt-bar">
+
+            <div
+                class="decrypt-fill"
+                id="decryptFill">
+            </div>
+
+        </div>
+
+        <div
+            class="decrypt-percent"
+            id="decryptPercent">
+            0%
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =======================================================
+SCREEN 4
+======================================================= -->
+
+<section class="screen" id="page4">
+
+    <div class="container">
+
+        <div class="identity">
+
+            <div>
+
+                <div class="kicker">
+                    IDENTITY VERIFIED
+                </div>
+
+                <div
+                    class="identity-name glitch"
+                    id="identityName"
+                    data-text="">
+                </div>
+
+                <div
+                    class="identity-role"
+                    id="identityRole">
+                </div>
+
+                <p
+                    class="identity-description"
+                    id="identityDescription">
+                </p>
+
+                <div class="hero-actions">
+
+                    <button
+                        class="primary-btn"
+                        onclick="goTo(5)">
+                        VIEW PLAYER CARD →
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div class="identity-side">
+
+                <div class="rarity-ring">
+
+                    <div
+                        class="rarity-symbol"
+                        id="raritySymbol">
+                        ✦
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =======================================================
+SCREEN 5
+======================================================= -->
+
+<section class="screen" id="page5">
+
+    <div class="container">
+
+        <div class="kicker">
+            PERSONAL PLAYER CARD
+        </div>
+
+        <div class="card-area">
+
+            <div
+                class="player-card"
+                id="playerCard">
+
+                <div class="card-inner">
+
+                    <div class="card-face card-front">
+
+                        <div class="card-shine"></div>
+
+                        <div class="card-header">
+
+                            <div class="card-brand">
+                                MYSTERY//DROP
+                            </div>
+
+                            <div
+                                class="rarity"
+                                id="cardRarity">
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="card-avatar"
+                            id="cardAvatar">
+                        </div>
+
+                        <div class="card-bottom">
+
+                            <div>
+
+                                <div
+                                    class="card-name"
+                                    id="cardName">
+                                </div>
+
+                                <div
+                                    class="card-role"
+                                    id="cardRole">
+                                </div>
+
+                            </div>
+
+                            <div class="card-level">
+
+                                LEVEL
+
+                                <strong id="cardLevel">
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="card-face card-back">
+
+                        <div class="card-brand">
+                            PERSONAL DATA
+                        </div>
+
+                        <div>
+
+                            <div class="info-title">
+                                SPECIAL SKILL
+                            </div>
+
+                            <div
+                                id="cardSkill"
+                                style="font-size:25px;font-weight:900;">
+                            </div>
+
+                        </div>
+
+                        <div>
+
+                            <div class="card-role">
+                                DROP ID
+                            </div>
+
+                            <div
+                                id="dropID"
+                                style="font-family:'Space Mono';font-size:12px;margin-top:5px;">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="flip-hint">
+            CLICK THE CARD TO FLIP IT
+        </div>
+
+        <div style="margin-top:35px;text-align:center;">
+
+            <button
+                class="primary-btn"
+                onclick="goTo(6)">
+                CONTINUE →
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =======================================================
+SCREEN 6
+======================================================= -->
+
+<section class="screen" id="page6">
+
+    <div class="container">
+
+        <div class="kicker">
+            PERSONALITY FILE
+        </div>
+
+        <h2 class="section-title">
+            WHO ARE YOU<br>
+            INSIDE THIS DROP?
+        </h2>
+
+        <p class="section-description">
+            Đây không phải bài kiểm tra tính cách.
+            Đây là một profile được viết riêng cho người đang
+            cầm chiếc code này.
+        </p>
+
+        <div class="personality-grid">
+
+            <div class="info-box">
+
+                <div class="info-icon">
+                    ◈
+                </div>
+
+                <div class="info-title">
+                    PERSONALITY
+                </div>
+
+                <div
+                    class="info-text"
+                    id="personality">
+                </div>
+
+            </div>
+
+            <div class="info-box">
+
+                <div class="info-icon">
+                    ◇
+                </div>
+
+                <div class="info-title">
+                    SIGNATURE TRAIT
+                </div>
+
+                <div
+                    class="info-text"
+                    id="trait">
+                </div>
+
+            </div>
+
+            <div class="info-box">
+
+                <div class="info-icon">
+                    ◎
+                </div>
+
+                <div class="info-title">
+                    WHAT MAKES YOU DIFFERENT
+                </div>
+
+                <div
+                    class="info-text"
+                    id="different">
+                </div>
+
+            </div>
+
+            <div class="info-box">
+
+                <div class="info-icon">
+                    ∞
+                </div>
+
+                <div class="info-title">
+                    POTENTIAL
+                </div>
+
+                <div
+                    class="info-text"
+                    id="potential">
+                </div>
+
+            </div>
+
+        </div>
+
+        <div style="margin-top:40px;text-align:center;">
+
+            <button
+                class="primary-btn"
+                onclick="goTo(7)">
+                OPEN THE MESSAGE →
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =======================================================
+SCREEN 7
+======================================================= -->
+
+<section class="screen" id="page7">
+
+    <div class="container">
+
+        <div class="kicker">
+            PRIVATE MESSAGE
+        </div>
+
+        <div class="message-card">
+
+            <div class="message-tag">
+                MESSAGE // PERSONAL // 19.11
+            </div>
+
+            <div
+                class="message-title"
+                id="messageTitle">
+            </div>
+
+            <div
+                class="message-body"
+                id="messageBody">
+            </div>
+
+            <div class="signature">
+                — từ những người đã làm nên
+                <span>19.11 này</span>
+            </div>
+
+        </div>
+
+        <div style="text-align:center;margin-top:40px;">
+
+            <button
+                class="primary-btn"
+                onclick="goTo(8)">
+                CONTINUE TO MEMORY LOG →
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =======================================================
+SCREEN 8
+======================================================= -->
+
+<section class="screen" id="page8">
+
+    <div class="container">
+
+        <div class="kicker">
+            PERSONAL DROP ANALYTICS
+        </div>
+
+        <h2 class="section-title">
+            YOUR STATS
+        </h2>
+
+        <p class="section-description">
+            Không phải điểm số thật.
+            Chỉ là cách hệ thống biến những điều đáng quý
+            thành một profile riêng.
+        </p>
+
+        <div class="stats">
+
+            <div class="stat">
+
+                <div class="stat-label">
+                    ENERGY
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="statEnergy">
+                    0
+                </div>
+
+                <div class="stat-bar">
+                    <div
+                        class="stat-fill"
+                        id="barEnergy">
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="stat">
+
+                <div class="stat-label">
+                    CREATIVITY
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="statCreativity">
+                    0
+                </div>
+
+                <div class="stat-bar">
+                    <div
+                        class="stat-fill"
+                        id="barCreativity">
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="stat">
+
+                <div class="stat-label">
+                    TEAMWORK
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="statTeamwork">
+                    0
+                </div>
+
+                <div class="stat-bar">
+                    <div
+                        class="stat-fill"
+                        id="barTeamwork">
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="stat">
+
+                <div class="stat-label">
+                    SPECIAL
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="statSpecial">
+                    0
+                </div>
+
+                <div class="stat-bar">
+                    <div
+                        class="stat-fill"
+                        id="barSpecial">
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div style="margin-top:50px;">
+
+            <div class="timeline">
+
+                <div class="timeline-item">
+
+                    <div class="timeline-dot"></div>
+
+                    <div class="timeline-date">
+                        01 // ACCESS
+                    </div>
+
+                    <div class="timeline-title">
+                        You found the entrance.
+                    </div>
+
+                    <div class="timeline-text">
+                        Một chiếc code tưởng như bình thường
+                        nhưng lại là chìa khóa của toàn bộ trải nghiệm.
+                    </div>
+
+                </div>
+
+                <div class="timeline-item">
+
+                    <div class="timeline-dot"></div>
+
+                    <div class="timeline-date">
+                        02 // IDENTITY
+                    </div>
+
+                    <div class="timeline-title">
+                        The system recognized you.
+                    </div>
+
+                    <div class="timeline-text">
+                        Không phải ai cũng nhìn thấy cùng một thứ.
+                        Profile này chỉ được tạo cho người đang đọc nó.
+                    </div>
+
+                </div>
+
+                <div class="timeline-item">
+
+                    <div class="timeline-dot"></div>
+
+                    <div class="timeline-date">
+                        03 // MESSAGE
+                    </div>
+
+                    <div class="timeline-title">
+                        Someone took time to write this.
+                    </div>
+
+                    <div class="timeline-text">
+                        Và có lẽ đó mới là phần quan trọng nhất
+                        của cả chiếc drop.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div style="text-align:center;margin-top:20px;">
+
+            <button
+                class="primary-btn"
+                onclick="goTo(9)">
+                FIND THE SECRET →
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =======================================================
+SCREEN 9
+======================================================= -->
+
+<section class="screen" id="page9">
+
+    <div class="container">
+
+        <div class="secret-wrap">
+
+            <div class="kicker">
+                CLASSIFIED
+            </div>
+
+            <div class="lock" id="lockIcon">
+                🔐
+            </div>
+
+            <h2 class="section-title">
+                THERE IS STILL
+                SOMETHING HIDDEN.
+            </h2>
+
+            <p class="section-description" style="margin-left:auto;margin-right:auto;">
+                Một món quà không nhất thiết phải kết thúc
+                ngay khi lời chúc kết thúc.
+            </p>
+
+            <button
+                class="primary-btn"
+                onclick="unlockSecret()"
+                id="secretBtn">
+                UNLOCK SECRET
+            </button>
+
+            <div
+                class="secret-content"
+                id="secretContent">
+
+                <div
+                    class="secret-message"
+                    id="secretMessage">
+                </div>
+
+            </div>
+
+            <div style="margin-top:45px;">
+
+                <button
+                    class="secondary-btn"
+                    onclick="goTo(10)">
+                    CONTINUE →
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =======================================================
+SCREEN 10
+======================================================= -->
+
+<section class="screen" id="page10">
+
+    <div class="container">
+
+        <div class="final">
+
+            <div class="final-code">
+                DROP COMPLETE // 19.11.2026
+            </div>
+
+            <div class="final-title">
+
+                THE DROP
+                <br>
+
+                <span class="gradient-text">
+                    WAS NEVER
+                    <br>
+                    THE REAL GIFT.
+                </span>
+
+            </div>
+
+            <p
+                class="final-sub"
+                id="finalMessage">
+            </p>
+
+            <button
+                class="primary-btn"
+                onclick="celebrate()">
+                COMPLETE THE DROP ✦
+            </button>
+
+            <div class="final-sign">
+                MADE WITH CODE, CANDY & A LITTLE CHAOS.
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- FOOTER -->
+
+<div class="footer">
+
+    <div class="page-dot active"></div>
+    <div class="page-dot"></div>
+    <div class="page-dot"></div>
+    <div class="page-dot"></div>
+    <div class="page-dot"></div>
+    <div class="page-dot"></div>
+    <div class="page-dot"></div>
+    <div class="page-dot"></div>
+    <div class="page-dot"></div>
+    <div class="page-dot"></div>
+
+</div>
+
+</div>
+
+<!-- TOAST -->
+
+<div
+    class="toast"
+    id="toast">
+</div>
+
+<!-- COMMAND PALETTE -->
+
+<div
+    class="command"
+    id="command">
+
+    <div class="command-box">
+
+        <input
+            class="command-input"
+            id="commandInput"
+            placeholder="Type a command..."
+            autocomplete="off">
+
+        <div class="command-list">
+
+            <div
+                class="command-item"
+                onclick="goTo(1)">
+                /home — Go home
+            </div>
+
+            <div
+                class="command-item"
+                onclick="goTo(2)">
+                /access — Enter code
+            </div>
+
+            <div
+                class="command-item"
+                onclick="goTo(5)">
+                /card — Open player card
+            </div>
+
+            <div
+                class="command-item"
+                onclick="goTo(7)">
+                /message — Read message
+            </div>
+
+            <div
+                class="command-item"
+                onclick="goTo(9)">
+                /secret — Find secret
+            </div>
+
+            <div
+                class="command-item"
+                onclick="toggleMatrix()">
+                /matrix — Toggle matrix mode
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+/* =========================================================
+   RECIPIENT DATABASE
+========================================================= */
+
+/*
+    Mỗi người có một object riêng.
+
+    Muốn sửa lời chúc:
+    chỉ cần sửa message / personality / secret.
+
+    Muốn thêm người:
+    copy một object rồi đổi code.
+*/
+
+const RECIPIENTS = {
+
+"KOD-7X4-TH9": {
+
+    name:"Nguyễn Trần Phước Thiện",
+
+    codename:"THE RELIABLE ONE",
+
+    role:"LEGENDARY • TEAM PLAYER",
+
+    rarity:"LEGENDARY",
+
+    level:"07",
+
+    symbol:"✦",
+
+    stats:{
+        energy:84,
+        creativity:88,
+        teamwork:96,
+        special:94
+    },
+
+    personality:
+`Có những người không cần phải xuất hiện quá ồn ào
+để người khác nhận ra sự hiện diện của mình.
+
+Điểm thú vị của kiểu người này nằm ở cảm giác
+“có mặt đúng lúc”. Khi một việc cần được hoàn thành,
+khi một nhóm cần thêm một người cùng làm,
+hoặc đơn giản là khi mọi người cần một người
+có thể cùng đi đến cuối chuyện — đó chính là thứ
+làm nên giá trị của một người.`,
+
+    trait:
+`RELIABILITY
+
+Không phải lúc nào cũng cần nói thật nhiều.
+Đôi khi việc khiến người khác yên tâm rằng
+“ừ, có người này ở đây” đã là một năng lực rất đáng quý.`,
+
+    different:
+`Bạn không cần phải trở thành bản sao của bất kỳ ai.
+
+Điều đáng giữ lại là cách bạn tạo ra cảm giác
+một tập thể vẫn có thể vận hành tốt hơn
+khi có bạn ở trong đó.`,
+
+    potential:
+`Nếu giữ được sự chủ động, tinh thần học hỏi
+và khả năng làm việc cùng người khác,
+bạn hoàn toàn có thể trở thành kiểu người
+mà người khác muốn tìm đến khi có một việc khó.`,
+
+    messageTitle:
+`PHƯỚC THIỆN — THIS ONE IS FOR YOU.`,
+
+    message:
+`Ê Thiện.
+
+Có một điều tao nghĩ khá lâu trước khi viết lời chúc này:
+một lời chúc thật sự đáng nhớ không nên chỉ là
+“chúc mày vui vẻ, học giỏi, thành công”.
+
+Mấy câu đó đúng, nhưng ai cũng có thể nói.
+
+Nên với mày, tao muốn nói về một thứ khác.
+
+Có những người khiến người khác nhớ đến mình
+không phải vì họ luôn đứng ở giữa mọi thứ,
+mà vì họ để lại cảm giác rằng:
+“Có người này ở đây thì mọi chuyện sẽ ổn hơn một chút.”
+
+Và tao nghĩ đó là một kiểu giá trị rất đáng giữ.
+
+Tuổi học sinh rồi sẽ qua nhanh hơn mình tưởng.
+Những buổi học, những lần làm bài, những cuộc nói chuyện
+vớ vẩn, những lần cùng nhau làm một việc gì đó —
+sau này nhìn lại có khi lại là những thứ mình nhớ nhất.
+
+Nên tao mong mày đừng chỉ cố trở thành
+một người giỏi hơn.
+
+Hãy trở thành một người mà chính mày cũng thấy
+tự hào khi nhìn lại.
+
+Có thể sau này mỗi đứa đi một hướng,
+có người tiếp tục với Tin,
+có người chọn một lĩnh vực khác,
+có người thay đổi hoàn toàn so với hiện tại.
+
+Nhưng tao mong dù đi đâu,
+mày vẫn giữ được sự chân thành,
+sự nhiệt tình và cái chất riêng của mày.
+
+Và nếu có một ngày mày thấy bản thân mình
+chưa đủ giỏi, chưa đủ nhanh, chưa đủ tốt,
+thì nhớ rằng chẳng ai bước vào tương lai
+với một phiên bản hoàn chỉnh cả.
+
+Cứ học thêm một chút.
+Cố thêm một chút.
+Sai thì sửa.
+Chưa biết thì học.
+Mệt thì nghỉ.
+Rồi đi tiếp.
+
+Chúc mày có một tuổi học sinh thật đáng nhớ.
+
+Không phải vì mọi thứ đều hoàn hảo,
+mà vì khi nhìn lại,
+mày có thể nói:
+
+“Ừ, khoảng thời gian đó thật sự đáng.”
+
+19/11 vui vẻ nhé.
+
+Và cảm ơn vì đã là một phần
+của những ngày tháng này.`,
+
+    secret:
+`Psst...
+
+Nếu mày đọc được đến đây thì nghĩa là
+mày đã khám phá hết gần như toàn bộ hệ thống.
+
+Nhưng có một thứ không thể lưu trong code:
+
+những kỷ niệm thật sự.
+
+Website này rồi sẽ đóng.
+Candy rồi sẽ ăn hết.
+Code rồi sẽ bị quên.
+
+Nhưng khoảnh khắc cả đám cùng làm một chuyện
+ngớ ngẩn nhưng vui vẻ như thế này
+thì có khi sẽ nhớ lâu hơn.`,
+
+    final:
+`Phước Thiện,
+
+chúc mày không chỉ có một ngày 19/11 vui,
+mà còn có thật nhiều ngày khác đáng nhớ hơn nữa.
+
+Keep going.
+
+Your next level is waiting.`
+},
+
+"KOD-3M8-DT2": {
+
+    name:"Nguyễn Hoàng Đạt",
+
+    codename:"THE ENERGY CORE",
+
+    role:"EPIC • MOMENTUM ENGINE",
+
+    rarity:"EPIC",
+
+    level:"08",
+
+    symbol:"⚡",
+
+    stats:{
+        energy:97,
+        creativity:86,
+        teamwork:91,
+        special:93
+    },
+
+    personality:
+`Có những người bước vào một tập thể và vô tình
+làm không khí xung quanh thay đổi.
+
+Không nhất thiết phải là người nói nhiều nhất.
+Chỉ cần có một chút năng lượng, một chút hài hước,
+một chút sự chủ động — tự nhiên mọi thứ trở nên
+dễ chịu hơn.`,
+
+    trait:
+`MOMENTUM
+
+Một người có thể biến một khoảng thời gian bình thường
+thành một kỷ niệm mà cả nhóm cùng nhớ.`,
+
+    different:
+`Điều đáng quý không phải lúc nào cũng là thành tích.
+
+Đôi khi đó là khả năng khiến người khác
+cảm thấy thoải mái khi ở cạnh mình.`,
+
+    potential:
+`Đừng để năng lượng của mày chỉ dừng lại ở chuyện vui.
+
+Nếu biến nó thành sự chủ động,
+nó có thể trở thành một lợi thế cực mạnh
+trong học tập, teamwork và những thứ mày muốn làm.`,
+
+    messageTitle:
+`ĐẠT — KEEP THAT ENERGY.`,
+
+    message:
+`Đạt này.
+
+Nếu cuộc đời là một team game thì mỗi người
+chắc chắn sẽ có một role khác nhau.
+
+Có người là người lập kế hoạch.
+Có người thích làm phần khó.
+Có người quan sát.
+Có người giải quyết vấn đề.
+
+Và có những người đơn giản là khiến cả team
+đỡ “chán” hơn rất nhiều.
+
+Tao nghĩ năng lượng của một người
+thật ra là một thứ rất đặc biệt.
+
+Một câu nói đúng lúc.
+Một trò đùa đúng lúc.
+Một lần chủ động rủ người khác làm gì đó.
+Một lần kéo một người đang im lặng
+vào cuộc nói chuyện.
+
+Mấy thứ nhỏ như vậy đôi khi chẳng được tính điểm,
+nhưng lại là thứ làm nên một tập thể.
+
+Tao mong mày giữ được điều đó.
+
+Nhưng đồng thời, tao cũng mong mày nhớ rằng
+năng lượng mạnh nhất không phải lúc nào
+cũng là năng lượng ồn ào nhất.
+
+Có lúc cần vui.
+Có lúc cần tập trung.
+Có lúc cần nghiêm túc.
+Có lúc chỉ cần ngồi xuống và làm cho xong việc.
+
+Nếu mày kết hợp được sự nhiệt tình
+với khả năng kiểm soát bản thân,
+tao nghĩ mày sẽ còn tiến xa hơn rất nhiều.
+
+Chúc mày sau này gặp được thật nhiều người tốt,
+thật nhiều trải nghiệm đáng nhớ,
+và quan trọng nhất —
+đừng đánh mất cái chất riêng khiến mày trở thành mày.
+
+19/11 vui nhé.
+
+Hôm nay cứ enjoy trước đã.
+
+Level up sau.`,
+
+    secret:
+`SYSTEM NOTE:
+
+ENERGY DETECTED.
+
+WARNING:
+Có khả năng người sở hữu code này
+làm tăng độ ồn của phòng lên 37%.
+
+Nhưng hệ thống quyết định...
+cho phép.`,
+
+    final:
+`Đạt,
+
+cứ giữ năng lượng đó.
+
+Chỉ cần nhớ:
+đừng chỉ chạy nhanh —
+hãy biết mình đang chạy về đâu.`
+},
+
+"KOD-9Q2-TN6": {
+
+    name:"Nguyễn Ngô Đức Tín",
+
+    codename:"THE STRATEGIST",
+
+    role:"LEGENDARY • ANALYST",
+
+    rarity:"LEGENDARY",
+
+    level:"09",
+
+    symbol:"◈",
+
+    stats:{
+        energy:78,
+        creativity:94,
+        teamwork:90,
+        special:98
+    },
+
+    personality:
+`Có một kiểu người không nhất thiết phải phản ứng
+ngay lập tức với mọi thứ.
+
+Họ quan sát.
+Suy nghĩ.
+Ghép các chi tiết lại.
+
+Rồi đến lúc hành động,
+mọi thứ thường có lý do của nó.`,
+
+    trait:
+`STRATEGIC THINKING
+
+Không chỉ nhìn vào chuyện đang xảy ra,
+mà còn nhìn xem:
+“Nếu làm thế này thì tiếp theo sẽ thế nào?”`,
+
+    different:
+`Khả năng suy nghĩ sâu thường không nổi bật
+như sự ồn ào.
+
+Nhưng khi gặp một vấn đề thật sự khó,
+đó lại là thứ trở nên cực kỳ có giá trị.`,
+
+    potential:
+`Đừng ngại những bài toán khó.
+
+Nếu mày học được cách biến sự tò mò
+thành khả năng giải quyết vấn đề,
+đó sẽ là một trong những skill mạnh nhất
+mày có thể mang theo về sau.`,
+
+    messageTitle:
+`ĐỨC TÍN — THINK DIFFERENTLY.`,
+
+    message:
+`Tín,
+
+có một điều tao rất thích ở những người
+thích suy nghĩ trước khi làm.
+
+Đó là họ thường nhìn thấy những thứ
+người khác bỏ qua.
+
+Một chi tiết nhỏ.
+Một cách giải khác.
+Một khả năng mà ban đầu chẳng ai nghĩ tới.
+
+Và nếu mày đang đi theo con đường Tin học,
+tao nghĩ đó là một thứ cực kỳ đáng giữ.
+
+Bởi vì code không quan tâm
+mày học thuộc được bao nhiêu.
+
+Một bài toán đưa ra trước mặt mày
+và nó hỏi:
+
+“Bây giờ mày sẽ nghĩ thế nào?”
+
+Đó mới là phần thú vị.
+
+Tao mong mày đừng quá sợ những bài khó.
+
+Có thể hôm nay nhìn vào một bài,
+mày chẳng hiểu gì.
+
+Ngày mai vẫn chẳng hiểu.
+
+Nhưng một ngày nào đó,
+mày tự nhiên nhìn lại và nhận ra:
+
+“À.
+Hóa ra nó là như vậy.”
+
+Cảm giác đó cực kỳ đáng giá.
+
+Chúc mày không chỉ học giỏi,
+mà còn giữ được sự tò mò.
+
+Vì một người tò mò
+sẽ luôn có thứ để khám phá.
+
+Và một người biết cách đặt câu hỏi
+thường sẽ đi xa hơn một người
+chỉ biết tìm câu trả lời.
+
+19/11 vui nhé.
+
+Và nếu sau này mày trở thành
+một người giải quyết được những vấn đề
+mà ngày hôm nay mày còn chưa tưởng tượng ra,
+
+thì nhớ rằng:
+
+mọi thứ từng bắt đầu
+từ những bài code rất nhỏ.`,
+
+    secret:
+`CLASSIFIED THOUGHT:
+
+The best programmers are not the ones
+who memorize the most.
+
+They are the ones who keep asking:
+
+“WHY?”`,
+
+    final:
+`Tín,
+
+keep questioning.
+keep building.
+keep learning.
+
+The next problem is waiting.`
+},
+
+"KOD-5R7-KH4": {
+
+    name:"Lê Anh Khôi",
+
+    codename:"THE ALL-ROUNDER",
+
+    role:"EPIC • ADAPTIVE PLAYER",
+
+    rarity:"EPIC",
+
+    level:"08",
+
+    symbol:"◇",
+
+    stats:{
+        energy:89,
+        creativity:92,
+        teamwork:94,
+        special:90
+    },
+
+    personality:
+`Một người thú vị không nhất thiết phải chỉ có
+một màu.
+
+Có thể linh hoạt,
+có thể hòa nhập,
+có thể nghiêm túc khi cần
+và cũng có thể vui hết mình đúng lúc.`,
+
+    trait:
+`ADAPTABILITY
+
+Biết thay đổi cách tiếp cận
+mà vẫn giữ được bản thân.`,
+
+    different:
+`Không phải ai cũng có khả năng thích nghi
+với nhiều kiểu người và nhiều hoàn cảnh khác nhau.
+
+Đó là một lợi thế mà đôi khi chính mình
+không nhận ra.`,
+
+    potential:
+`Nếu biết biến sự linh hoạt thành kỹ năng,
+mày có thể làm tốt rất nhiều thứ
+thay vì chỉ giỏi đúng một thứ.`,
+
+    messageTitle:
+`ANH KHÔI — KEEP EXPLORING.`,
+
+    message:
+`Khôi,
+
+tao nghĩ tuổi này có một điều khá hay:
+
+mày chưa cần phải biết chính xác
+mình sẽ trở thành ai.
+
+Thật sự không cần.
+
+Có thể hôm nay thích một thứ,
+vài tháng sau lại thích thứ khác.
+
+Có thể đang nghĩ mình sẽ đi theo một hướng,
+rồi một ngày lại phát hiện ra
+một thứ hoàn toàn mới.
+
+Và điều đó không có gì sai.
+
+Thật ra,
+đó chính là cách mình lớn lên.
+
+Tao mong mày cứ thử.
+
+Thử những thứ mới.
+Thử những cách mới.
+Thử những thứ ban đầu tưởng rằng
+“chắc mình không làm được đâu”.
+
+Vì đôi khi năng lực của một người
+không nằm ở việc họ đã giỏi cái gì,
+
+mà nằm ở việc họ dám học cái gì tiếp theo.
+
+Chúc mày luôn có đủ tò mò
+để khám phá,
+đủ kiên nhẫn để học,
+và đủ tự tin để không phải
+so sánh mình với người khác.
+
+Mỗi người có một timeline riêng.
+
+Mày cứ đi timeline của mày.
+
+19/11 vui vẻ.`,
+
+    secret:
+`PROFILE NOTE:
+
+ADAPTABILITY LEVEL:
+HIGH.
+
+Recommended action:
+Keep exploring unknown territory.`,
+
+    final:
+`Khôi,
+
+đừng vội chọn một phiên bản cuối cùng của bản thân.
+
+Mày còn rất nhiều phiên bản
+chưa được unlock.`
+},
+
+"KOD-8P3-MN1": {
+
+    name:"Lê Gia Minh",
+
+    codename:"THE QUIET FORCE",
+
+    role:"EPIC • STEADY CORE",
+
+    rarity:"EPIC",
+
+    level:"06",
+
+    symbol:"◉",
+
+    stats:{
+        energy:75,
+        creativity:90,
+        teamwork:92,
+        special:95
+    },
+
+    personality:
+`Không phải dấu ấn nào cũng cần thật lớn.
+
+Có những người tạo ảnh hưởng
+bằng những điều rất nhỏ:
+
+một lần giúp đỡ,
+một lần lắng nghe,
+một lần làm đúng phần việc của mình.`,
+
+    trait:
+`STEADINESS
+
+Không cần lúc nào cũng đứng ở trung tâm
+để trở thành một phần quan trọng.`,
+
+    different:
+`Sự ổn định thường không gây chú ý ngay lập tức.
+
+Nhưng khi nó biến mất,
+người ta mới nhận ra nó quan trọng đến thế nào.`,
+
+    potential:
+`Hãy tin hơn vào khả năng của chính mình.
+
+Đừng để sự khiêm tốn biến thành việc
+đánh giá thấp bản thân.`,
+
+    messageTitle:
+`GIA MINH — QUIET DOESN'T MEAN INVISIBLE.`,
+
+    message:
+`Gia Minh,
+
+có một điều tao muốn nói với mày:
+
+không phải ai đáng quý
+cũng cần phải thật ồn ào.
+
+Có những người bước vào một căn phòng
+và lập tức khiến mọi người chú ý.
+
+Nhưng cũng có những người
+không cần làm điều đó.
+
+Họ chỉ đơn giản là ở đó,
+làm phần của mình,
+giúp khi cần,
+và để mọi thứ tự nói lên.
+
+Tao nghĩ những điều như vậy
+thường dễ bị bỏ qua.
+
+Nhưng chính những thứ nhỏ đó
+lại tạo nên cảm giác
+một tập thể đang hoạt động tốt.
+
+Nên nếu đôi khi mày cảm thấy
+mình chưa nổi bật như người khác,
+đừng vội nghĩ rằng
+mình kém quan trọng hơn.
+
+Không phải tất cả giá trị
+đều cần được nhìn thấy ngay.
+
+Có những thứ cần thời gian.
+
+Tao mong mày tiếp tục học,
+tiếp tục thử,
+tiếp tục phát triển,
+nhưng cũng nhớ rằng
+mày không cần biến mình thành
+một người khác để được công nhận.
+
+Cứ là phiên bản tốt hơn
+của chính mày là đủ.
+
+19/11 vui nhé.`,
+
+    secret:
+`HIDDEN MESSAGE:
+
+Some of the strongest signals
+are the ones that don't need noise.`,
+
+    final:
+`Gia Minh,
+
+stay steady.
+
+Quiet progress
+is still progress.`
+},
+
+"KOD-4V9-QC7": {
+
+    name:"Anh Quốc",
+
+    codename:"THE WILDCARD",
+
+    role:"RARE • UNPREDICTABLE",
+
+    rarity:"RARE",
+
+    level:"07",
+
+    symbol:"?",
+
+    stats:{
+        energy:91,
+        creativity:96,
+        teamwork:84,
+        special:97
+    },
+
+    personality:
+`Có những người không dễ đoán.
+
+Không phải vì họ cố làm khác người,
+mà vì họ có cách suy nghĩ và phản ứng
+không hoàn toàn giống công thức thông thường.`,
+
+    trait:
+`UNPREDICTABILITY
+
+Một chút bất ngờ đôi khi chính là thứ
+làm cho một người trở nên đáng nhớ.`,
+
+    different:
+`Không phải mọi thứ đều cần một công thức.
+
+Có những ý tưởng chỉ xuất hiện
+khi mình dám thử một hướng khác.`,
+
+    potential:
+`Đừng để sự khác biệt trở thành lý do
+để tự thu mình.
+
+Hãy biến nó thành thứ giúp mày
+tạo ra những điều người khác không nghĩ tới.`,
+
+    messageTitle:
+`ANH QUỐC — STAY UNPREDICTABLE.`,
+
+    message:
+`Anh Quốc,
+
+tao nghĩ những người có chất riêng
+thường có một điểm chung:
+
+họ không quá cố gắng để trở thành
+một phiên bản giống người khác.
+
+Có thể họ đôi khi hơi khó đoán.
+Có thể có những suy nghĩ
+không giống số đông.
+
+Nhưng chính những điều đó
+lại làm nên cá tính.
+
+Tao mong mày giữ được điều đó.
+
+Không phải cứ khác biệt
+là phải chứng minh rằng mình khác biệt.
+
+Chỉ cần mày biết mình thích gì,
+muốn gì,
+và đang cố gắng vì điều gì,
+thế là đủ.
+
+Sau này chắc chắn sẽ có những lúc
+người khác không hiểu mày.
+
+Chuyện đó bình thường.
+
+Điều quan trọng là
+mày có hiểu chính mình hay không.
+
+Chúc mày luôn có đủ tự tin
+để bước theo hướng riêng,
+đủ tỉnh táo để biết lúc nào cần thay đổi,
+và đủ vui để tận hưởng
+những năm tháng này.
+
+19/11 vui nhé.
+
+Và nhớ:
+
+đừng để hệ thống dự đoán được mày quá dễ.`,
+
+    secret:
+`SYSTEM ERROR:
+
+USER BEHAVIOR CANNOT BE PREDICTED.
+
+Recommendation:
+Do whatever you were going to do anyway.`,
+
+    final:
+`Anh Quốc,
+
+stay weird.
+stay creative.
+stay you.`
+},
+
+"KOD-6N2-BA8": {
+
+    name:"Đoàn Trường Bảo",
+
+    codename:"THE BUILDER",
+
+    role:"LEGENDARY • MAKER",
+
+    rarity:"LEGENDARY",
+
+    level:"08",
+
+    symbol:"◆",
+
+    stats:{
+        energy:86,
+        creativity:95,
+        teamwork:91,
+        special:97
+    },
+
+    personality:
+`Có một kiểu người thích nhìn thứ gì đó
+và nghĩ:
+
+“Làm sao để biến nó thành thật?”
+
+Đó là tư duy của người xây dựng.
+
+Không chỉ nghĩ.
+Mà còn muốn làm.`,
+
+    trait:
+`BUILDING MINDSET
+
+Ý tưởng chỉ thực sự thú vị
+khi nó bắt đầu tồn tại ngoài đầu mình.`,
+
+    different:
+`Không phải ai cũng thích biến ý tưởng
+thành một thứ có thể chạm vào,
+chạy được,
+hoặc nhìn thấy được.`,
+
+    potential:
+`Nếu tiếp tục học cách biến ý tưởng
+thành sản phẩm,
+mày sẽ có một skill cực kỳ mạnh:
+
+MAKE THINGS REAL.`,
+
+    messageTitle:
+`TRƯỜNG BẢO — BUILD SOMETHING.`,
+
+    message:
+`Bảo,
+
+tao rất thích một kiểu tư duy:
+
+“Thôi làm thử đi.”
+
+Không cần biết ngay nó hoàn hảo hay chưa.
+
+Cứ làm bản đầu tiên.
+
+Sau đó nhìn nó.
+Thấy lỗi.
+Sửa.
+Làm tiếp.
+
+Đó là cách rất nhiều thứ lớn bắt đầu.
+
+Không phải bằng một ý tưởng hoàn hảo,
+mà bằng một phiên bản đầu tiên
+có thể còn rất xấu.
+
+Tao mong mày giữ được sự chủ động đó.
+
+Nếu có một ý tưởng,
+đừng chỉ nói:
+
+“Sau này tao sẽ làm.”
+
+Hãy thử làm một phần nhỏ ngay hôm nay.
+
+Một đoạn code.
+Một project.
+Một thiết kế.
+Một thứ gì đó.
+
+Bởi vì khoảnh khắc mày nhìn thấy
+thứ mình nghĩ trong đầu
+biến thành thứ thật sự tồn tại,
+nó có cảm giác rất khác.
+
+Chúc mày sau này làm được
+nhiều thứ mà hôm nay
+mày còn nghĩ là khó.
+
+Và nếu có một ngày
+mày tạo ra một thứ thật sự lớn,
+
+hãy nhớ rằng
+mọi thứ từng bắt đầu
+từ những lần “làm thử” như thế này.
+
+Happy 19/11.`,
+
+    secret:
+`BUILD LOG #001
+
+Ideas are cheap.
+
+Finished projects are rare.
+
+Keep building.`,
+
+    final:
+`Bảo,
+
+don't just imagine the future.
+
+Build it.`
+},
+
+"KOD-1T8-KH5": {
+
+    name:"Khoa",
+
+    codename:"THE UNLOCKED POTENTIAL",
+
+    role:"RARE • POTENTIAL CLASS",
+
+    rarity:"RARE",
+
+    level:"07",
+
+    symbol:"∞",
+
+    stats:{
+        energy:82,
+        creativity:89,
+        teamwork:88,
+        special:96
+    },
+
+    personality:
+`Một trong những điều thú vị nhất ở tuổi này
+là mình vẫn còn rất nhiều thứ chưa biết
+mình có thể làm được.
+
+Và đó không phải điểm yếu.
+
+Đó là khoảng không để phát triển.`,
+
+    trait:
+`POTENTIAL
+
+Chưa biết mình giỏi gì
+không có nghĩa là mình không thể giỏi.`,
+
+    different:
+`Không ai nhìn thấy toàn bộ khả năng của mình
+ngay từ đầu.
+
+Nhiều thứ chỉ xuất hiện
+sau khi mình thử.`,
+
+    potential:
+`Đừng ngại bắt đầu từ mức cơ bản.
+
+Một kỹ năng nhỏ được luyện đủ lâu
+có thể trở thành lợi thế cực lớn.`,
+
+    messageTitle:
+`KHOA — KEEP UNLOCKING.`,
+
+    message:
+`Khoa,
+
+có một thứ tao nghĩ rất đáng quý
+ở tuổi học sinh:
+
+mình vẫn còn thời gian để thử.
+
+Thử một môn mới.
+Thử một cách học mới.
+Thử một project.
+Thử một cuộc thi.
+Thử một thứ mà trước đó
+mình nghĩ mình không hợp.
+
+Có thể một số lần sẽ thất bại.
+
+Không sao.
+
+Vì mục đích của việc thử
+không phải lúc nào cũng là thành công ngay.
+
+Đôi khi mục đích đơn giản là
+tìm ra:
+
+“À, hóa ra mình thích cái này.”
+
+Hoặc:
+
+“À, cái này không dành cho mình.”
+
+Cả hai đều là thông tin.
+
+Tao mong mày đừng tự giới hạn bản thân
+bằng những câu như
+“tao không giỏi cái đó”.
+
+Có thể hiện tại chưa giỏi.
+
+Nhưng “chưa giỏi”
+khác hoàn toàn với
+“không thể giỏi”.
+
+Chúc mày luôn giữ được sự tò mò,
+dám thử,
+dám sai,
+và dám bắt đầu lại.
+
+Biết đâu một ngày,
+mày sẽ unlock được
+một phiên bản của bản thân
+mà hiện tại chính mày
+cũng chưa biết tồn tại.
+
+19/11 vui nhé.`,
+
+    secret:
+`UNLOCK STATUS:
+
+Potential detected.
+
+There are still many hidden levels.`,
+
+    final:
+`Khoa,
+
+you are not finished.
+
+You're still unlocking.`
+},
+
+"KOD-7L3-PH6": {
+
+    name:"Xuân Phong",
+
+    codename:"THE MOMENTUM",
+
+    role:"EPIC • FORWARD MOTION",
+
+    rarity:"EPIC",
+
+    level:"07",
+
+    symbol:"➜",
+
+    stats:{
+        energy:93,
+        creativity:87,
+        teamwork:90,
+        special:92
+    },
+
+    personality:
+`Có những người hợp với một từ:
+
+TIẾN.
+
+Không nhất thiết lúc nào cũng nhanh,
+nhưng quan trọng là không đứng yên quá lâu.`,
+
+    trait:
+`MOMENTUM
+
+Một bước nhỏ mỗi ngày
+vẫn đưa mình đi rất xa.`,
+
+    different:
+`Thành công hiếm khi đến từ
+một ngày cực kỳ xuất sắc.
+
+Nó thường đến từ rất nhiều ngày
+bình thường nhưng có cố gắng.`,
+
+    potential:
+`Nếu biết giữ nhịp độ,
+mày có thể biến những mục tiêu lớn
+thành một chuỗi việc nhỏ có thể hoàn thành.`,
+
+    messageTitle:
+`XUÂN PHONG — KEEP MOVING.`,
+
+    message:
+`Phong,
+
+nếu có một lời chúc tao muốn dành cho mày
+thì đó là:
+
+đừng đứng yên.
+
+Không có nghĩa là phải lúc nào cũng chạy.
+
+Có những ngày mệt,
+thì đi chậm.
+
+Có những ngày vui,
+thì chạy nhanh hơn.
+
+Nhưng đừng bỏ luôn con đường
+chỉ vì một đoạn hôm nay khó.
+
+Mọi thứ lớn đều bắt đầu từ những bước rất nhỏ.
+
+Một bài tập.
+Một lần thử.
+Một lần sửa lỗi.
+Một ngày học thêm một chút.
+
+Những thứ đó nhìn riêng lẻ
+thì chẳng có gì đặc biệt.
+
+Nhưng cộng lại,
+nó trở thành tiến bộ.
+
+Tao mong mày sau này
+khi gặp một mục tiêu lớn
+đừng nhìn cả ngọn núi rồi sợ.
+
+Chia nó thành từng bước.
+
+Xong bước một.
+Rồi bước hai.
+
+Một ngày nào đó quay lại,
+mày sẽ nhận ra:
+
+“Ủa, mình đi xa đến vậy rồi à?”
+
+Chúc mày có thật nhiều năng lượng,
+nhiều mục tiêu,
+và đủ kiên trì để theo chúng
+đến cùng.
+
+19/11 vui nhé.`,
+
+    secret:
+`MOTION DETECTED.
+
+Current position:
+NOT THE END.
+
+Next checkpoint:
+UNKNOWN.`,
+
+    final:
+`Phong,
+
+one step.
+
+Then another.
+
+Keep moving.`
+},
+
+"KOD-2X9-DP4": {
+
+    name:"MYSTERY RECIPIENT 01",
+
+    codename:"UNKNOWN ENTITY I",
+
+    role:"MYSTERY • UNIDENTIFIED",
+
+    rarity:"MYSTERY",
+
+    level:"??",
+
+    symbol:"?",
+
+    stats:{
+        energy:88,
+        creativity:88,
+        teamwork:88,
+        special:99
+    },
+
+    personality:
+`Hệ thống chưa có đủ dữ liệu.
+
+Có lẽ đó lại chính là điều thú vị.
+
+Một người chưa được định nghĩa hoàn toàn
+vẫn còn rất nhiều thứ để khám phá.`,
+
+    trait:
+`UNKNOWN VARIABLE`,
+
+    different:
+`Không phải mọi thứ thú vị
+đều cần được giải thích ngay.`,
+
+    potential:
+`UNDEFINED.
+
+Which means:
+the possibilities are still open.`,
+
+    messageTitle:
+`UNKNOWN ENTITY — WHOEVER YOU ARE...`,
+
+    message:
+`Nếu mày là người đang đọc đoạn này
+thì xin chúc mừng.
+
+Hệ thống vẫn chưa xác định được
+mày là ai.
+
+Nhưng có một điều nó biết:
+
+mày đã có code.
+
+Và thế là đủ.
+
+Chúc mày một ngày 19/11 thật vui,
+ăn kẹo không bị đau răng,
+nhận quà không bị hụt,
+và quan trọng nhất:
+
+hãy tận hưởng những khoảnh khắc
+mà sau này có thể mày sẽ nhớ lại.
+
+PROFILE STATUS:
+
+UNKNOWN.
+
+FINAL STATUS:
+
+AWESOME ENOUGH.`,
+
+    secret:
+`SECRET:
+
+You were never supposed
+to find this.
+
+...or were you?`,
+
+    final:
+`UNKNOWN TODAY.
+
+POSSIBLY LEGENDARY TOMORROW.`
+},
+
+"KOD-5M1-DP8": {
+
+    name:"MYSTERY RECIPIENT 02",
+
+    codename:"UNKNOWN ENTITY II",
+
+    role:"MYSTERY • CLASSIFIED",
+
+    rarity:"MYSTERY",
+
+    level:"??",
+
+    symbol:"◌",
+
+    stats:{
+        energy:90,
+        creativity:93,
+        teamwork:89,
+        special:97
+    },
+
+    personality:
+`Dữ liệu nhân vật đang bị khóa.
+
+Nhưng đôi khi một profile chưa hoàn chỉnh
+lại thú vị hơn một profile có sẵn mọi câu trả lời.`,
+
+    trait:
+`CLASSIFIED`,
+
+    different:
+`Không ai biết toàn bộ câu chuyện
+của một người chỉ bằng vài dòng dữ liệu.`,
+
+    potential:
+`ACCESS RESTRICTED.
+
+Try again in the future.`,
+
+    messageTitle:
+`CLASSIFIED MESSAGE.`,
+
+    message:
+`Gửi người sở hữu code này.
+
+Có thể mày đang chờ một lời chúc
+thật dài.
+
+Có rồi đây.
+
+Chúc mày luôn có những người bạn
+khiến một ngày bình thường
+trở nên đáng nhớ.
+
+Chúc mày có những ngày học hành
+không quá áp lực.
+
+Có những lần cười đến mức
+không hiểu tại sao mình lại cười.
+
+Có những project,
+những cuộc thi,
+những chuyến đi,
+những kỷ niệm mà vài năm sau
+nhìn lại vẫn thấy vui.
+
+Và nếu hôm nay có ai nói:
+
+“Ủa, quà gì mà lắm thứ vậy?”
+
+Thì cứ trả lời:
+
+“Không biết.
+Tao cũng đang khám phá.”
+
+19/11 vui vẻ nhé.`,
+
+    secret:
+`CLASSIFIED:
+
+The secret is...
+
+you made it this far.`,
+
+    final:
+`CLASSIFIED.
+
+DROP COMPLETE.`
+},
+
+"KOD-8Q6-DP2": {
+
+    name:"MYSTERY RECIPIENT 03",
+
+    codename:"UNKNOWN ENTITY III",
+
+    role:"MYSTERY • HIDDEN CLASS",
+
+    rarity:"MYSTERY",
+
+    level:"??",
+
+    symbol:"∞",
+
+    stats:{
+        energy:92,
+        creativity:95,
+        teamwork:93,
+        special:100
+    },
+
+    personality:
+`Hồ sơ này cố tình không ghi hết.
+
+Vì đôi khi điều thú vị nhất
+không nằm ở những gì đã biết,
+mà nằm ở những gì còn chưa được khám phá.`,
+
+    trait:
+`INFINITE POSSIBILITY`,
+
+    different:
+`Không có một phiên bản cố định nào
+của một con người.`,
+
+    potential:
+`∞
+
+No final level detected.`,
+
+    messageTitle:
+`THERE IS NO FINAL VERSION OF YOU.`,
+
+    message:
+`Có một điều rất dễ quên khi còn đi học:
+
+mình không phải một con số.
+
+Không phải một điểm kiểm tra.
+Không phải một bảng xếp hạng.
+Không phải một lần làm đúng hay làm sai.
+
+Những thứ đó chỉ là dữ liệu
+ở một thời điểm.
+
+Còn mày vẫn đang thay đổi.
+
+Hôm nay có thể chưa làm được.
+Ngày mai có thể làm được.
+
+Hôm nay thích một thứ.
+Năm sau có thể thích một thứ khác.
+
+Và tất cả đều bình thường.
+
+Tao mong mày đừng quá áp lực
+với việc phải trở thành một ai đó
+ngay lập tức.
+
+Cứ học.
+Cứ thử.
+Cứ chơi.
+Cứ sai.
+Cứ sửa.
+
+Và quan trọng nhất:
+
+hãy tận hưởng quãng thời gian
+mà mình còn có thể cùng nhau
+làm những chuyện rất ngớ ngẩn
+nhưng rất vui như thế này.
+
+19/11 vui nhé.
+
+Profile này không có final form.`,
+
+    secret:
+`FINAL FORM:
+
+NOT FOUND.
+
+Because there isn't one.`,
+
+    final:
+`There is no final version.
+
+Keep evolving.`
+},
+
+"MYT-7C9-LEG": {
+
+    name:"THẦY CƯỜNG",
+
+    codename:"THE ARCHITECT",
+
+    role:"MYTHIC • TEACHER • MENTOR",
+
+    rarity:"MYTHIC",
+
+    level:"∞",
+
+    symbol:"✦",
+
+    stats:{
+        energy:96,
+        creativity:98,
+        teamwork:100,
+        special:100
+    },
+
+    personality:
+`Một người thầy không chỉ xuất hiện
+để truyền đạt kiến thức.
+
+Một người thầy tốt còn có thể khiến
+một học sinh nhìn thấy một con đường
+mà trước đó họ chưa từng nghĩ tới.`,
+
+    trait:
+`MENTORSHIP
+
+Dạy một bài học có thể mất một tiết.
+
+Nhưng truyền cảm hứng
+có thể ảnh hưởng đến nhiều năm.`,
+
+    different:
+`Điều đặc biệt của một người thầy
+không chỉ nằm ở những gì họ dạy,
+mà còn nằm ở cách họ khiến học sinh
+muốn tự mình tìm hiểu thêm.`,
+
+    potential:
+`LEGACY
+
+Một bài học có thể kết thúc
+khi tiết học kết thúc.
+
+Nhưng ảnh hưởng của một người thầy
+có thể tiếp tục rất lâu sau đó.`,
+
+    messageTitle:
+`THẦY CƯỜNG — THIS ONE IS DIFFERENT.`,
+
+    message:
+`Thầy Cường,
+
+nếu thầy đã mở được đến đây
+thì có lẽ thầy đã nhận ra
+website này không giống những phiên bản
+mà tụi em làm cho các bạn.
+
+Vì thật ra,
+người nhận món quà này cũng khác.
+
+Tụi em có thể nói một lời cảm ơn
+trong vài giây.
+
+Nhưng để viết được một lời cảm ơn
+thật sự có ý nghĩa,
+tụi em mới nhận ra rằng
+có rất nhiều điều không dễ nói thành lời.
+
+Cảm ơn thầy vì những giờ học.
+
+Cảm ơn thầy vì những lần sửa bài,
+những lần chỉ cho tụi em cách suy nghĩ,
+cách nhìn một bài toán,
+cách tìm ra lỗi trong code,
+và quan trọng hơn —
+cách không bỏ cuộc ngay khi một bài
+không chạy như mình muốn.
+
+Có những thứ lúc học
+tụi em có thể chưa nhận ra ngay.
+
+Một lời nhắc.
+Một bài tập.
+Một lần thầy bắt làm lại.
+Một lỗi nhỏ mà thầy chỉ ra.
+
+Nhưng sau này,
+có thể chính những điều đó
+lại trở thành nền tảng
+cho một thứ lớn hơn.
+
+Tụi em biết mình vẫn còn rất nhỏ
+so với những gì thế giới ngoài kia có.
+
+Có rất nhiều thứ tụi em chưa biết.
+Có rất nhiều bài toán chưa giải được.
+Có rất nhiều lần code vẫn còn lỗi.
+Có rất nhiều mục tiêu còn ở rất xa.
+
+Nhưng có lẽ điều may mắn là
+tụi em đang được bắt đầu.
+
+Và trong hành trình bắt đầu đó,
+thầy là một trong những người
+đã giúp tụi em nhìn thấy
+Tin học không chỉ là những dòng code.
+
+Nó là cách suy nghĩ.
+
+Là khả năng chia một vấn đề lớn
+thành những phần nhỏ.
+
+Là việc sai rồi sửa.
+
+Là việc không hiểu hôm nay
+nhưng ngày mai lại hiểu.
+
+Là việc nhìn một bài toán
+và tự hỏi:
+
+“Có cách nào tốt hơn không?”
+
+Có thể sau này
+tụi em sẽ đi những con đường rất khác.
+
+Có người tiếp tục với lập trình.
+Có người chọn một ngành khác.
+Có người sẽ quên mất những đoạn code
+mình từng viết.
+
+Nhưng tụi em nghĩ
+những gì thầy đã truyền lại
+sẽ không biến mất hoàn toàn.
+
+Nó sẽ nằm đâu đó
+trong cách tụi em học,
+cách tụi em suy nghĩ,
+cách tụi em giải quyết vấn đề.
+
+Và đó có lẽ
+là một trong những món quà lớn nhất
+mà một người thầy có thể để lại.
+
+Nhân ngày 20/11,
+tụi em chúc thầy thật nhiều sức khỏe,
+luôn giữ được sự nhiệt huyết
+với công việc,
+luôn có thật nhiều học sinh
+khiến thầy tự hào,
+
+và quan trọng nhất:
+
+mong thầy luôn biết rằng
+những điều thầy làm
+có ý nghĩa hơn tụi em
+có thể nói hết bằng một lời chúc.
+
+Cảm ơn thầy.
+
+Vì đã dạy tụi em code.
+
+Và có lẽ còn hơn thế nữa.
+
+Happy Teacher's Day,
+thầy Cường.`,
+
+    secret:
+`TEACHER ACCESS — SPECIAL MESSAGE
+
+Có một điều tụi em muốn nói
+nhưng không muốn đặt ở phần chính:
+
+Nếu một ngày nào đó
+tụi em đủ giỏi để tự xây dựng
+những thứ thật sự lớn,
+
+tụi em sẽ luôn nhớ
+đã từng có một người thầy
+đứng ở điểm bắt đầu.
+
+Thank you, thầy.`,
+
+    final:
+`THẦY CƯỜNG,
+
+THE CODE MAY CHANGE.
+
+THE PROJECTS MAY CHANGE.
+
+THE STUDENTS MAY CHANGE.
+
+BUT THE IMPACT OF A GOOD TEACHER
+CAN LAST MUCH LONGER.
+
+THANK YOU FOR BEING PART
+OF OUR BEGINNING.`
+}
+
+};
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let currentRecipient = null;
+
+let currentPage = 1;
+
+let soundEnabled = true;
+
+let secretUnlocked = false;
+
+/* =========================================================
+   BOOT
+========================================================= */
+
+window.addEventListener("load",()=>{
+
+    const bar =
+        document.getElementById("bootProgress");
+
+    let progress = 0;
+
+    const timer =
+        setInterval(()=>{
+
+            progress +=
+                Math.random()*8 + 4;
+
+            if(progress >= 100){
+
+                progress = 100;
+
+                clearInterval(timer);
+
+                setTimeout(()=>{
+
+                    document
+                        .getElementById("boot")
+                        .classList.add("hidden");
+
+                    document
+                        .getElementById("app")
+                        .classList.add("ready");
+
+                },500);
+
+            }
+
+            bar.style.width =
+                progress + "%";
+
+        },120);
+
+});
+
+/* =========================================================
+   CURSOR
+========================================================= */
+
+const cursor =
+    document.getElementById("cursor");
+
+document.addEventListener("mousemove",(e)=>{
+
+    document.documentElement.style
+        .setProperty("--mx",e.clientX+"px");
+
+    document.documentElement.style
+        .setProperty("--my",e.clientY+"px");
+
+    cursor.style.left =
+        e.clientX+"px";
+
+    cursor.style.top =
+        e.clientY+"px";
+
+});
+
+/* =========================================================
+   PARTICLES
+========================================================= */
+
+const canvas =
+    document.getElementById("particles");
+
+const ctx =
+    canvas.getContext("2d");
+
+let particles = [];
+
+function resizeCanvas(){
+
+    canvas.width =
+        window.innerWidth;
+
+    canvas.height =
+        window.innerHeight;
+
+}
+
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
+
+resizeCanvas();
+
+for(let i=0;i<70;i++){
+
+    particles.push({
+
+        x:Math.random()*canvas.width,
+
+        y:Math.random()*canvas.height,
+
+        size:Math.random()*2+0.5,
+
+        speed:
+            Math.random()*.25+.05,
+
+        alpha:
+            Math.random()*.6+.1
+
+    });
+
+}
+
+function drawParticles(){
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    particles.forEach(p=>{
+
+        p.y -= p.speed;
+
+        if(p.y < 0){
+
+            p.y =
+                canvas.height;
+
+        }
+
+        ctx.globalAlpha =
+            p.alpha;
+
+        ctx.fillStyle =
+            "#ffffff";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            p.x,
+            p.y,
+            p.size,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+    });
+
+    requestAnimationFrame(
+        drawParticles
+    );
+
+}
+
+drawParticles();
+
+/* =========================================================
+   MATRIX
+========================================================= */
+
+const matrix =
+    document.getElementById("matrix");
+
+const mctx =
+    matrix.getContext("2d");
+
+function resizeMatrix(){
+
+    matrix.width =
+        window.innerWidth;
+
+    matrix.height =
+        window.innerHeight;
+
+}
+
+resizeMatrix();
+
+window.addEventListener(
+    "resize",
+    resizeMatrix
+);
+
+function matrixEffect(){
+
+    const chars =
+        "01KODDY19DROP";
+
+    const fontSize = 13;
+
+    const columns =
+        Math.floor(
+            matrix.width/fontSize
+        );
+
+    const drops =
+        Array(columns).fill(1);
+
+    function draw(){
+
+        mctx.fillStyle =
+            "rgba(0,0,0,.07)";
+
+        mctx.fillRect(
+            0,
+            0,
+            matrix.width,
+            matrix.height
+        );
+
+        mctx.fillStyle =
+            "#00e5ff";
+
+        mctx.font =
+            fontSize+"px monospace";
+
+        for(let i=0;i<drops.length;i++){
+
+            const text =
+                chars[
+                    Math.floor(
+                        Math.random()*chars.length
+                    )
+                ];
+
+            mctx.fillText(
+                text,
+                i*fontSize,
+                drops[i]*fontSize
+            );
+
+            if(
+                drops[i]*fontSize >
+                matrix.height &&
+                Math.random()>.975
+            ){
+
+                drops[i]=0;
+
+            }
+
+            drops[i]++;
+
+        }
+
+        requestAnimationFrame(draw);
+
+    }
+
+    draw();
+
+}
+
+matrixEffect();
+
+function toggleMatrix(){
+
+    const current =
+        matrix.style.opacity;
+
+    matrix.style.opacity =
+        current === "1"
+        ? "0"
+        : "0.12";
+
+    showToast(
+        current === "1"
+        ? "Matrix mode OFF"
+        : "Matrix mode ON"
+    );
+
+}
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function goTo(page){
+
+    document
+        .querySelectorAll(".screen")
+        .forEach(el=>{
+            el.classList.remove("active");
+        });
+
+    const target =
+        document.getElementById(
+            "page"+page
+        );
+
+    if(target){
+
+        target.classList.add("active");
+
+        currentPage =
+            page;
+
+        updateDots();
+
+        window.scrollTo({
+            top:0,
+            behavior:"smooth"
+        });
+
+        playBeep(
+            page === 10
+            ? 800
+            : 500
+        );
+
+    }
+
+}
+
+function updateDots(){
+
+    document
+        .querySelectorAll(".page-dot")
+        .forEach((dot,index)=>{
+
+            dot.classList.toggle(
+                "active",
+                index === currentPage-1
+            );
+
+        });
+
+}
+
+/* =========================================================
+   CODE
+========================================================= */
+
+document
+    .getElementById("codeInput")
+    .addEventListener("keydown",(e)=>{
+
+        if(e.key === "Enter"){
+
+            verifyCode();
+
+        }
+
+    });
+
+function verifyCode(){
+
+    const input =
+        document
+        .getElementById("codeInput");
+
+    const code =
+        input.value
+        .trim()
+        .toUpperCase();
+
+    const error =
+        document.getElementById(
+            "codeError"
+        );
+
+    if(!code){
+
+        error.textContent =
+            "> ERROR: CODE REQUIRED.";
+
+        playError();
+
+        return;
+
+    }
+
+    const recipient =
+        RECIPIENTS[code];
+
+    if(!recipient){
+
+        error.textContent =
+            "> ACCESS DENIED: UNKNOWN CODE.";
+
+        input.animate(
+            [
+                {transform:"translateX(0)"},
+                {transform:"translateX(-8px)"},
+                {transform:"translateX(8px)"},
+                {transform:"translateX(0)"}
+            ],
+            300
+        );
+
+        playError();
+
+        return;
+
+    }
+
+    error.textContent =
+        "> ACCESS GRANTED.";
+
+    currentRecipient =
+        recipient;
+
+    playBeep(900);
+
+    loadRecipient();
+
+    goTo(3);
+
+    startDecrypt();
+
+}
+
+/* =========================================================
+   LOAD RECIPIENT
+========================================================= */
+
+function loadRecipient(){
+
+    const r =
+        currentRecipient;
+
+    document
+        .getElementById("decryptName")
+        .textContent =
+        r.name;
+
+    document
+        .getElementById("identityName")
+        .textContent =
+        r.name;
+
+    document
+        .getElementById("identityName")
+        .dataset.text =
+        r.name;
+
+    document
+        .getElementById("identityRole")
+        .textContent =
+        r.codename+
+        " // "+
+        r.role;
+
+    document
+        .getElementById("identityDescription")
+        .textContent =
+        r.personality
+        .split("\n")[0];
+
+    document
+        .getElementById("raritySymbol")
+        .textContent =
+        r.symbol;
+
+    document
+        .getElementById("cardRarity")
+        .textContent =
+        r.rarity;
+
+    document
+        .getElementById("cardAvatar")
+        .textContent =
+        getInitials(r.name);
+
+    document
+        .getElementById("cardName")
+        .textContent =
+        r.name;
+
+    document
+        .getElementById("cardRole")
+        .textContent =
+        r.codename;
+
+    document
+        .getElementById("cardLevel")
+        .textContent =
+        r.level;
+
+    document
+        .getElementById("cardSkill")
+        .textContent =
+        r.codename;
+
+    document
+        .getElementById("dropID")
+        .textContent =
+        generateDropID(r);
+
+    document
+        .getElementById("personality")
+        .textContent =
+        r.personality;
+
+    document
+        .getElementById("trait")
+        .textContent =
+        r.trait;
+
+    document
+        .getElementById("different")
+        .textContent =
+        r.different;
+
+    document
+        .getElementById("potential")
+        .textContent =
+        r.potential;
+
+    document
+        .getElementById("messageTitle")
+        .textContent =
+        r.messageTitle;
+
+    document
+        .getElementById("messageBody")
+        .textContent =
+        r.message;
+
+    document
+        .getElementById("secretMessage")
+        .textContent =
+        r.secret;
+
+    document
+        .getElementById("finalMessage")
+        .textContent =
+        r.final;
+
+    setStat(
+        "Energy",
+        r.stats.energy
+    );
+
+    setStat(
+        "Creativity",
+        r.stats.creativity
+    );
+
+    setStat(
+        "Teamwork",
+        r.stats.teamwork
+    );
+
+    setStat(
+        "Special",
+        r.stats.special
+    );
+
+    secretUnlocked =
+        false;
+
+    document
+        .getElementById("secretContent")
+        .classList.remove("show");
+
+    document
+        .getElementById("secretBtn")
+        .textContent =
+        "UNLOCK SECRET";
+
+    document
+        .getElementById("lockIcon")
+        .textContent =
+        "🔐";
+
+}
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function getInitials(name){
+
+    const parts =
+        name
+        .replace(
+            "Nguyễn",
+            ""
+        )
+        .replace(
+            "Trần",
+            ""
+        )
+        .replace(
+            "Lê",
+            ""
+        )
+        .replace(
+            "Đoàn",
+            ""
+        )
+        .trim()
+        .split(" ");
+
+    if(parts.length === 1){
+
+        return parts[0]
+            .slice(0,2)
+            .toUpperCase();
+
+    }
+
+    return (
+        parts[0][0] +
+        parts[parts.length-1][0]
+    ).toUpperCase();
+
+}
+
+function generateDropID(r){
+
+    const clean =
+        r.name
+        .replace(/[^A-Za-z0-9]/g,"")
+        .toUpperCase();
+
+    return (
+        "19-11-" +
+        clean.slice(0,3) +
+        "-" +
+        r.level
+    );
+
+}
+
+/* =========================================================
+   DECRYPT
+========================================================= */
+
+function startDecrypt(){
+
+    let progress = 0;
+
+    const fill =
+        document.getElementById(
+            "decryptFill"
+        );
+
+    const percent =
+        document.getElementById(
+            "decryptPercent"
+        );
+
+    const timer =
+        setInterval(()=>{
+
+            progress +=
+                Math.random()*8+4;
+
+            if(progress >= 100){
+
+                progress=100;
+
+                clearInterval(timer);
+
+                setTimeout(()=>{
+
+                    goTo(4);
+
+                },700);
+
+            }
+
+            fill.style.width =
+                progress+"%";
+
+            percent.textContent =
+                Math.floor(progress)+"%";
+
+        },140);
+
+}
+
+/* =========================================================
+   STATS
+========================================================= */
+
+function setStat(name,value){
+
+    const id =
+        name.toLowerCase();
+
+    const valueEl =
+        document.getElementById(
+            "stat"+name
+        );
+
+    const barEl =
+        document.getElementById(
+            "bar"+name
+        );
+
+    if(!valueEl || !barEl)
+        return;
+
+    valueEl.textContent =
+        value;
+
+    setTimeout(()=>{
+
+        barEl.style.width =
+            value+"%";
+
+    },500);
+
+}
+
+/* =========================================================
+   CARD
+========================================================= */
+
+document
+    .getElementById("playerCard")
+    .addEventListener(
+        "click",
+        function(){
+
+            this.classList.toggle(
+                "flipped"
+            );
+
+            playBeep(650);
+
+        }
+    );
+
+document
+    .getElementById("playerCard")
+    .addEventListener(
+        "mousemove",
+        function(e){
+
+            const rect =
+                this.getBoundingClientRect();
+
+            const x =
+                e.clientX -
+                rect.left;
+
+            const y =
+                e.clientY -
+                rect.top;
+
+            const rotateY =
+                ((x/rect.width)-.5)*18;
+
+            const rotateX =
+                -((y/rect.height)-.5)*18;
+
+            this.style.transform =
+                `rotateX(${rotateX}deg)
+                 rotateY(${rotateY}deg)`;
+
+        }
+    );
+
+document
+    .getElementById("playerCard")
+    .addEventListener(
+        "mouseleave",
+        function(){
+
+            this.style.transform =
+                "";
+
+        }
+    );
+
+/* =========================================================
+   SECRET
+========================================================= */
+
+function unlockSecret(){
+
+    if(secretUnlocked){
+
+        return;
+
+    }
+
+    secretUnlocked=true;
+
+    document
+        .getElementById("secretContent")
+        .classList.add("show");
+
+    document
+        .getElementById("secretBtn")
+        .textContent =
+        "SECRET UNLOCKED ✓";
+
+    document
+        .getElementById("lockIcon")
+        .textContent =
+        "🔓";
+
+    playBeep(1100);
+
+    celebrateSmall();
+
+}
+
+/* =========================================================
+   COMMAND
+========================================================= */
+
+function openCommand(){
+
+    const box =
+        document.getElementById(
+            "command"
+        );
+
+    box.classList.add("show");
+
+    setTimeout(()=>{
+
+        document
+            .getElementById("commandInput")
+            .focus();
+
+    },100);
+
+}
+
+document
+    .getElementById("command")
+    .addEventListener(
+        "click",
+        function(e){
+
+            if(e.target === this){
+
+                this.classList.remove(
+                    "show"
+                );
+
+            }
+
+        }
+    );
+
+document
+    .getElementById("commandInput")
+    .addEventListener(
+        "keydown",
+        function(e){
+
+            if(e.key === "Escape"){
+
+                document
+                    .getElementById("command")
+                    .classList.remove(
+                        "show"
+                    );
+
+            }
+
+            if(e.key === "Enter"){
+
+                const command =
+                    this.value
+                    .trim()
+                    .toLowerCase();
+
+                if(command === "/matrix"){
+
+                    toggleMatrix();
+
+                }
+
+                else if(command === "/home"){
+
+                    goTo(1);
+
+                }
+
+                else if(command === "/access"){
+
+                    goTo(2);
+
+                }
+
+                else if(command === "/card"){
+
+                    goTo(5);
+
+                }
+
+                else if(command === "/message"){
+
+                    goTo(7);
+
+                }
+
+                else if(command === "/secret"){
+
+                    goTo(9);
+
+                }
+
+                else{
+
+                    showToast(
+                        "Unknown command"
+                    );
+
+                }
+
+                document
+                    .getElementById("command")
+                    .classList.remove(
+                        "show"
+                    );
+
+                this.value="";
+
+            }
+
+        }
+    );
+
+/* =========================================================
+   SOUND
+========================================================= */
+
+let audioCtx = null;
+
+function getAudio(){
+
+    if(!audioCtx){
+
+        audioCtx =
+            new (
+                window.AudioContext ||
+                window.webkitAudioContext
+            )();
+
+    }
+
+    return audioCtx;
+
+}
+
+function playBeep(freq=600){
+
+    if(!soundEnabled)
+        return;
+
+    try{
+
+        const audio =
+            getAudio();
+
+        const oscillator =
+            audio.createOscillator();
+
+        const gain =
+            audio.createGain();
+
+        oscillator.type =
+            "sine";
+
+        oscillator.frequency.value =
+            freq;
+
+        gain.gain.setValueAtTime(
+            .0001,
+            audio.currentTime
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            .06,
+            audio.currentTime+.01
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            .0001,
+            audio.currentTime+.15
+        );
+
+        oscillator.connect(gain);
+
+        gain.connect(
+            audio.destination
+        );
+
+        oscillator.start();
+
+        oscillator.stop(
+            audio.currentTime+.16
+        );
+
+    }catch(e){}
+
+}
+
+function playError(){
+
+    playBeep(150);
+
+}
+
+function toggleSound(){
+
+    soundEnabled =
+        !soundEnabled;
+
+    document
+        .getElementById("soundBtn")
+        .textContent =
+        soundEnabled
+        ? "♪"
+        : "×";
+
+    showToast(
+        soundEnabled
+        ? "Sound ON"
+        : "Sound OFF"
+    );
+
+}
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+let toastTimer;
+
+function showToast(message){
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+    toast.textContent =
+        message;
+
+    toast.classList.add(
+        "show"
+    );
+
+    clearTimeout(
+        toastTimer
+    );
+
+    toastTimer =
+        setTimeout(()=>{
+
+            toast.classList.remove(
+                "show"
+            );
+
+        },2500);
+
+}
+
+/* =========================================================
+   CONFETTI
+========================================================= */
+
+function celebrateSmall(){
+
+    for(let i=0;i<40;i++){
+
+        createConfetti();
+
+    }
+
+}
+
+function celebrate(){
+
+    for(let i=0;i<130;i++){
+
+        createConfetti();
+
+    }
+
+    playBeep(1200);
+
+    showToast(
+        "DROP COMPLETE ✦"
+    );
+
+}
+
+function createConfetti(){
+
+    const el =
+        document.createElement(
+            "div"
+        );
+
+    el.style.position =
+        "fixed";
+
+    el.style.left =
+        Math.random()*100+"vw";
+
+    el.style.top =
+        "-10px";
+
+    el.style.width =
+        Math.random()*7+4+"px";
+
+    el.style.height =
+        Math.random()*12+5+"px";
+
+    el.style.background =
+        [
+            "#7c5cff",
+            "#00e5ff",
+            "#ff3cac",
+            "#45f0a0",
+            "#ffd166"
+        ][
+            Math.floor(
+                Math.random()*5
+            )
+        ];
+
+    el.style.zIndex =
+        "9999";
+
+    el.style.pointerEvents =
+        "none";
+
+    document.body.appendChild(el);
+
+    const duration =
+        Math.random()*2+2;
+
+    el.animate(
+        [
+            {
+                transform:
+                    "translateY(0) rotate(0deg)",
+                opacity:1
+            },
+            {
+                transform:
+                    `translateY(110vh)
+                     translateX(${(Math.random()-.5)*300}px)
+                     rotate(${Math.random()*1000}deg)`,
+                opacity:0
+            }
+        ],
+        {
+            duration:
+                duration*1000,
+            easing:"cubic-bezier(.2,.7,.3,1)"
+        }
+    ).onfinish=()=>el.remove();
+
+}
+
+/* =========================================================
+   KEYBOARD SHORTCUTS
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    (e)=>{
+
+        if(
+            e.ctrlKey &&
+            e.shiftKey &&
+            e.key.toLowerCase()==="p"
+        ){
+
+            e.preventDefault();
+
+            openCommand();
+
+        }
+
+        if(e.key === "ArrowRight"){
+
+            if(currentPage < 10){
+
+                goTo(
+                    currentPage+1
+                );
+
+            }
+
+        }
+
+        if(e.key === "ArrowLeft"){
+
+            if(currentPage > 1){
+
+                goTo(
+                    currentPage-1
+                );
+
+            }
+
+        }
+
+    }
+);
+
+/* =========================================================
+   EASTER EGGS
+========================================================= */
+
+let konami = [];
+
+const secretSequence = [
+    "ArrowUp",
+    "ArrowUp",
+    "ArrowDown",
+    "ArrowDown",
+    "ArrowLeft",
+    "ArrowRight",
+    "ArrowLeft",
+    "ArrowRight"
+];
+
+document.addEventListener(
+    "keydown",
+    (e)=>{
+
+        konami.push(
+            e.key
+        );
+
+        if(
+            konami.length >
+            secretSequence.length
+        ){
+
+            konami.shift();
+
+        }
+
+        if(
+            konami.join("|") ===
+            secretSequence.join("|")
+        ){
+
+            toggleMatrix();
+
+            celebrateSmall();
+
+            showToast(
+                "EASTER EGG FOUND // KONAMI"
+            );
+
+            konami=[];
+
+        }
+
+    }
+);
+
+/* =========================================================
+   DOUBLE CLICK LOGO
+========================================================= */
+
+document
+    .querySelector(".logo")
+    .addEventListener(
+        "dblclick",
+        ()=>{
+
+            showToast(
+                "SYSTEM STATUS: PERFECTLY UNNECESSARY."
+            );
+
+            celebrateSmall();
+
+        }
+    );
+
+/* =========================================================
+   RANDOM IDLE MESSAGE
+========================================================= */
+
+let idleTimer;
+
+function resetIdle(){
+
+    clearTimeout(
+        idleTimer
+    );
+
+    idleTimer =
+        setTimeout(()=>{
+
+            if(
+                currentPage >= 4 &&
+                currentPage <= 9
+            ){
+
+                showToast(
+                    "Psst... mày vẫn còn đang đọc đấy à?"
+                );
+
+            }
+
+        },30000);
+
+}
+
+document.addEventListener(
+    "mousemove",
+    resetIdle
+);
+
+document.addEventListener(
+    "keydown",
+    resetIdle
+);
+
+resetIdle();
+
+/* =========================================================
+   SECRET WORDS
+========================================================= */
+
+let typed = "";
+
+document.addEventListener(
+    "keydown",
+    (e)=>{
+
+        if(
+            e.key.length === 1
+        ){
+
+            typed +=
+                e.key.toLowerCase();
+
+            if(typed.length > 20){
+
+                typed =
+                    typed.slice(-20);
+
+            }
+
+            if(
+                typed.includes("koddy")
+            ){
+
+                showToast(
+                    "KODDY MODE DETECTED."
+                );
+
+                celebrateSmall();
+
+                typed="";
+
+            }
+
+            if(
+                typed.includes("19.11")
+            ){
+
+                showToast(
+                    "19.11 // SPECIAL DROP"
+                );
+
+                typed="";
+
+            }
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+</html>
